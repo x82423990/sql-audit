@@ -18,7 +18,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         查询：根据登录者身份返回相关的SQL，支持日期/模糊搜索。操作：执行（execute）, 回滚（rollback）,放弃（reject操作）
     '''
     serializer_class = InceptionSerializer
-    permission_classes = [IsHandleAble]
+    # permission_classes = [IsHandleAble]
     search_fields = ['commiter', 'sql_content', 'env', 'treater', 'remark']
 
     def filter_date(self, queryset):
@@ -29,16 +29,35 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
     def get_queryset(self):
         userobj = self.request.user
-        print(userobj)
-        if userobj.is_superuser or userobj.role == self.dev_spm:
+        print(userobj, userobj.role)
+        # 如果是管理员显示全部工单
+        if userobj.is_superuser:
             return self.filter_date(Inceptsql.objects.all())
-        query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_spm else userobj.inceptsql_set.all()
+        if userobj.role == self.dev_spm:
+            return self.filter_date(Inceptsql.objects.filter(status=0))
+        query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
         return self.filter_date(query_set)
 
-    def check_approve_status(self, instance):
-        step_instance = instance.workorder.step_set.all()[1]
-        if step_instance.status != 0:
+    def check_and_set_approve_status(self, instance):
+        # step_instance = instance.workorder.step_set.all()[1]
+        # process = instance.workorder.step_set.all > 3
+        # # step_instance = process[1] if process else None
+        # if not process:
+        #     raise ParseError(self.approve_warning)
+        user = self.request.user
+        stepobj = instance.workorder.step_set.get(user_id=user.id)
+        # 求上级
+        prestep = instance.workorder.step_set.get(pk=stepobj.id - 1)
+        # 求下级
+        nexsetp = instance.workorder.step_set.get(pk=stepobj + 1)
+        if stepobj.status != 0:
             raise ParseError(self.approve_warning)
+
+        if prestep.status != 0:
+            raise ParseError("你的上级还没有审批")
+
+    def set_approve_status(self, instance):
+        pass
 
     def filter_select_type(self, instance):
         type = instance.type
@@ -53,6 +72,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 if status == 1:
                     instance.workorder.status = True
                     instance.workorder.save()
+            print("rage afer", instance.workorder.step_set.order_by('id'))
             step_instance = instance.workorder.step_set.order_by('id')[step_number]
             step_instance.status = status
             step_instance.save()
@@ -65,13 +85,12 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
     @action(detail=True)
     def execute(self, request, *args, **kwargs):
-        print("我来了")
         instance = self.get_object()
+        # 判断工单是否为执行过
         if instance.status != -1:
             self.ret = {'status': -2, 'msg': self.executed}
             return Response(self.ret)
         affected_rows = 0
-        print("affected_rows", affected_rows)
         instance.status = 0
         if instance.type == self.type_select_tag:
             sql_query = SqlQuery(instance.db)
@@ -81,12 +100,14 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         else:
             execute_time = 0
             opids = []
-            success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id, instance.sql_content)
+            success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id, instance.sql_content,
+                                                                                 self.action_type_execute)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
                 execute_time += float(success_sql[9])
                 opids.append(success_sql[7].replace("'", ""))
+            # 如果返回的列表有值，代表inception执行失败，并返回执行失败的错误
             if exception_sqls:
                 instance.status = 2
                 instance.execute_errors = exception_sqls
@@ -97,9 +118,10 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             self.ret['data']['execute_time'] = '%.3f' % execute_time
         instance.exe_affected_rows = affected_rows
         self.ret['data']['affected_rows'] = affected_rows
-        self.mail(instance, self.action_type_execute)
+        # self.mail(instance, self.action_type_execute)
         self.replace_remark(instance)
-        self.handle_approve(2, 1, 2)
+        # self.handle_approve(2, 1, 2)
+        print(self.ret)
         return Response(self.ret)
 
     @detail_route()

@@ -50,7 +50,11 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             # users_id.append(None)
             print("userid", users_id)
             for index, uid in enumerate(users_id):
-                status = 1 if index == 0 else 0
+                # status = 1 if index == 0 else 0
+                status = 0
+                print("--------------------", uid, index)
+                print("-----------status", status)
+
                 print("instance_id", instance_id)
                 # 保存step流程
                 step_serializer = self.serializer_step(data={'work_order': work_id, 'user': uid, 'status': status})
@@ -77,13 +81,13 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # group_id
         request_data['group'] = self.check_user_group(request)
         # leader name
-        # ['treater'] = request_data.pop('treater_username')
+        request_data['commiter'] = request.user.username
         leader_obj = NewGroup.objects.get(pk=request_data['group']).leader
         request_data['treater'] = leader_obj.username
         # 那些上面显示工单
         # print(leader_obj.username)
         request_data['users'] = [request.user.id, leader_obj.id]
-
+        print(request_data['users'])
         userlist = self.get_step_user(leader_obj)
 
         request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程
@@ -97,7 +101,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             request_data['type'] = self.type_select_tag
         else:
             # inception 执行返回的结果
-            handle_result = self.check_execute_sql(request_data.get('db'), sql_content)[-1]
+            handle_result = self.check_execute_sql(request_data.get('db'), sql_content, self.action_type_check)[-1]
 
         # 初始化一个工单
         workorder_serializer = self.serializer_order(data={})

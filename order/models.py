@@ -15,7 +15,7 @@ class Dbconf(BaseModel):
         ('prd', u'生产环境'),
         ('test', u'测试环境')
     )
-    related_user = models.ManyToManyField(User,  blank=True)
+    related_user = models.ManyToManyField(User, blank=True)
     user = models.CharField(max_length=128)
     password = models.CharField(max_length=128)
     host = models.CharField(max_length=16)
@@ -58,13 +58,14 @@ class Inceptsql(BaseModel):
     rollback_db = models.CharField(max_length=100, null=True, blank=True)
     handle_result = models.TextField(default='', null=True, blank=True, verbose_name='处理详情')
 
+
 class Suggestion(BaseModel):
     work_order = models.ForeignKey(Inceptsql, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
 
 class Strategy(BaseModel):
-    users = models.ManyToManyField(User,  blank=True)
+    users = models.ManyToManyField(User, blank=True)
     is_manual_review = models.BooleanField(default=False, verbose_name='有流程')
 
 

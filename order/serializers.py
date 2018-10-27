@@ -20,14 +20,11 @@ class InceptionSerializer(serializers.ModelSerializer):
     def get_step(self, instance):
         data = []
         # 获取工单步骤
-        print(instance.id)
         steps = instance.workorder.step_set.order_by('id')
-        print("1", steps)
         for step in steps:
             username = step.user.username if step.user else self.admin
             updatetime = step.updatetime if step.status != 0 else ''
             # group = self.get_step_user_group(step.user)
-            print("setps", username)
             data.append(
                 {
                     'id': step.id,
@@ -44,7 +41,6 @@ class InceptionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super(InceptionSerializer, self).to_representation(instance)
         ret['db_name'] = instance.db.name
-        print("----------------------------")
         ret['steps'] = self.get_step(instance)
         return ret
 
