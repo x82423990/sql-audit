@@ -11,6 +11,8 @@ from order.mixins import ActionMxins
 from order.permission import IsHandleAble
 from order.serializers import *
 from order.models import *
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class InceptionMainView(PromptMxins, ActionMxins, BaseView):
@@ -18,7 +20,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         查询：根据登录者身份返回相关的SQL，支持日期/模糊搜索。操作：执行（execute）, 回滚（rollback）,放弃（reject操作）
     '''
     serializer_class = InceptionSerializer
-    # permission_classes = [IsHandleAble]
+    permission_classes = [IsHandleAble]
     search_fields = ['commiter', 'sql_content', 'env', 'treater', 'remark']
 
     def filter_date(self, queryset):
@@ -27,6 +29,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             return queryset.filter(createtime__range=date_range.split(','))
         return queryset
 
+
     def get_queryset(self):
         userobj = self.request.user
         print(userobj, userobj.role)
@@ -34,27 +37,47 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         if userobj.is_superuser:
             return self.filter_date(Inceptsql.objects.all())
         if userobj.role == self.dev_spm:
-            return self.filter_date(Inceptsql.objects.filter(status=0))
+            return self.filter_date(Inceptsql.objects.filter(Q(status=0) | Q(up=True)))
         query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
         return self.filter_date(query_set)
 
-    def check_and_set_approve_status(self, instance):
+    def check_and_set_approve_status(self, instance, status_code):
         # step_instance = instance.workorder.step_set.all()[1]
         # process = instance.workorder.step_set.all > 3
         # # step_instance = process[1] if process else None
         # if not process:
         #     raise ParseError(self.approve_warning)
         user = self.request.user
-        stepobj = instance.workorder.step_set.get(user_id=user.id)
+        print("审核用户", user.username)
+        try:
+            stepobj = instance.workorder.step_set.get(user_id=user.id)
+        except ObjectDoesNotExist:
+            raise ParseError("你没有改工单的审批权限")
+
         # 求上级
-        prestep = instance.workorder.step_set.get(pk=stepobj.id - 1)
+        prestep = instance.workorder.step_set.filter(pk=stepobj.id - 1)[0] if instance.workorder.step_set.filter(
+            pk=stepobj.id - 1) else None
         # 求下级
-        nexsetp = instance.workorder.step_set.get(pk=stepobj + 1)
+        nexsetp = instance.workorder.step_set.filter(pk=stepobj.id + 1)[0] if instance.workorder.step_set.filter(
+            pk=stepobj.id + 1) else None
+        print("--%s---%s----%s---" % (stepobj, prestep, nexsetp))
         if stepobj.status != 0:
             raise ParseError(self.approve_warning)
 
-        if prestep.status != 0:
+        if prestep and prestep.status != 1:
             raise ParseError("你的上级还没有审批")
+
+        # 判断是否有上级
+        if nexsetp:
+            instance.up = True
+        else:
+            # 没有上级直接改变状态
+            instance.workorder.status = True
+        # 改变自己步骤的状态
+        instance.workorder.save()
+        instance.save()
+        stepobj.status = status_code
+        stepobj.save()
 
     def set_approve_status(self, instance):
         pass
@@ -68,14 +91,14 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         instance = self.get_object()
         if self.has_flow(instance):
             if call_type == 1:
-                self.check_approve_status(instance)
-                if status == 1:
-                    instance.workorder.status = True
-                    instance.workorder.save()
-            print("rage afer", instance.workorder.step_set.order_by('id'))
+                self.check_and_set_approve_status(instance, status)
+                # if status == 1:
+                #     instance.workorder.status = True
+                #     instance.workorder.save()
+            # print("rage afer", instance.workorder.step_set.order_by('id'))
             step_instance = instance.workorder.step_set.order_by('id')[step_number]
-            step_instance.status = status
-            step_instance.save()
+            # step_instance.status = status
+            # step_instance.save()
             if call_type == 3:
                 steps = instance.workorder.step_set.all()
                 steps_behind = steps.filter(id__gt=step_instance.id)
@@ -100,7 +123,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         else:
             execute_time = 0
             opids = []
-            success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id, instance.sql_content,
+            success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
+                                                                                 instance.sql_content,
                                                                                  self.action_type_execute)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
@@ -133,7 +157,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         self.handle_approve(3, 3, role_step)
         return Response(self.ret)
 
-    @detail_route()
+    @action(detail=True)
     def approve(self, request, *args, **kwargs):
         self.handle_approve(1, 1, 1)
         return Response(self.ret)

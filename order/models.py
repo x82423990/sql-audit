@@ -49,6 +49,7 @@ class Inceptsql(BaseModel):
     sql_backup = models.TextField()
     env = models.CharField(max_length=8, choices=ENVS)
     type = models.CharField(max_length=32, null=True, blank=True)
+    up = models.BooleanField(default=False, verbose_name='副总审批')
     treater = models.CharField(max_length=32)
     status = models.IntegerField(default=-1, choices=STATUS)
     execute_errors = models.TextField(default='', null=True, blank=True)

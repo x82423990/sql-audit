@@ -47,7 +47,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 检查是否需要开启审核
         if self.is_manual_review and instance.env == self.env_prd:
             instance_id = instance.id
-            # users_id.append(None)
             print("userid", users_id)
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
@@ -72,8 +71,9 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         a = 201
         userlist = [leader_id, ]
         if a > 200:
-            developer_supremo = User.objects.get(role="developer_supremo")
+            developer_supremo = User.objects.filter(role="developer_supremo")[0]
             userlist.append(developer_supremo.id)
+        print(userlist)
         return userlist
 
     def create(self, request, *args, **kwargs):
@@ -85,9 +85,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         leader_obj = NewGroup.objects.get(pk=request_data['group']).leader
         request_data['treater'] = leader_obj.username
         # 那些上面显示工单
-        # print(leader_obj.username)
+        print(leader_obj.username)
         request_data['users'] = [request.user.id, leader_obj.id]
-        print(request_data['users'])
+        print("--------------", request_data['users'])
+        # 获取审核流程的审核人
         userlist = self.get_step_user(leader_obj)
 
         request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程

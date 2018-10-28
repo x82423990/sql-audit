@@ -42,6 +42,7 @@ class InceptionSerializer(serializers.ModelSerializer):
         ret = super(InceptionSerializer, self).to_representation(instance)
         ret['db_name'] = instance.db.name
         ret['steps'] = self.get_step(instance)
+        ret['work_order_status'] = instance.workorder.status
         return ret
 
 
