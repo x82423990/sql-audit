@@ -54,7 +54,7 @@ class ActionMxins(AppellationMixins, object):
         uri = self.request.META['PATH_INFO'].split('/')[-2]
         if username != sqlobj.treater:
             sqlobj.remark += '   [' + username + self.action_desc_map.get(uri) + ']'
-        if sqlobj.workorder.status == True:
+        if sqlobj.workorder.status:
             steps = sqlobj.workorder.step_set.all()
             step_obj_second = steps[1]
             if not (self.request.user == step_obj_second.user and uri == 'reject'):
@@ -84,6 +84,12 @@ class ActionMxins(AppellationMixins, object):
         if exception_sqls and self.action_type == '--enable-check':
             raise ParseError({self.exception_sqls: exception_sqls})
         return success_sqls, exception_sqls, json.dumps(result)
+
+    def max_effect_rows(self, db_id, sql_content):
+        dbobj = Dbconf.objects.get(id=db_id)
+        db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, actiontype=None)
+        rows = Inception(sql_content, dbobj.name).rows_effect(db_addr)
+        return rows
 
     def mail(self, sqlobj, mailtype):
         if sqlobj.env == self.env_prd:

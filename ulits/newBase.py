@@ -5,7 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 
 
 class ReturnFormatMixin(object):
-    ret = {'status': 0, 'msg': '', 'data': {}}
+    ret = {'status': 0, 'msg': 'success！', 'data': {}}
 
 
 class BasePagination(PageNumberPagination):

@@ -47,14 +47,9 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 检查是否需要开启审核
         if self.is_manual_review and instance.env == self.env_prd:
             instance_id = instance.id
-            print("userid", users_id)
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
                 status = 0
-                print("--------------------", uid, index)
-                print("-----------status", status)
-
-                print("instance_id", instance_id)
                 # 保存step流程
                 step_serializer = self.serializer_step(data={'work_order': work_id, 'user': uid, 'status': status})
                 step_serializer.is_valid(raise_exception=True)
@@ -66,33 +61,31 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             return False
         return strategy_instance.is_manual_review if env == self.env_prd else False
 
-    def get_step_user(self, leader_obj):
-        leader_id = leader_obj.id
-        a = 201
-        userlist = [leader_id, ]
-        if a > 200:
-            developer_supremo = User.objects.filter(role="developer_supremo")[0]
+    def get_step_user(self, userlist, db_id, sql_context):
+
+        self.max_effect_rows()
+        # 获取SQL 语句的影响行数
+        rows = 201
+        if rows > 200:
+            try:
+                developer_supremo = User.objects.filter(role="developer_supremo")[0]
+            except IndexError:
+                raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
-        print(userlist)
         return userlist
 
     def create(self, request, *args, **kwargs):
+        # 处理 数据
         request_data = request.data
-        # group_id
-        request_data['group'] = self.check_user_group(request)
-        # leader name
-        request_data['commiter'] = request.user.username
-        leader_obj = NewGroup.objects.get(pk=request_data['group']).leader
-        request_data['treater'] = leader_obj.username
-        # 那些上面显示工单
-        print(leader_obj.username)
-        request_data['users'] = [request.user.id, leader_obj.id]
-        print("--------------", request_data['users'])
-        # 获取审核流程的审核人
-        userlist = self.get_step_user(leader_obj)
-
-        request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程
+        db_id = request_data.get('db')
         sql_content = request_data.get('sql_content')
+
+        user_group_id = self.check_user_group(request)
+        leader_obj = NewGroup.objects.get(pk=user_group_id).leader
+        approve_user_list = [request.user.id, leader_obj.id]
+        work_step_list = self.get_step_user(approve_user_list, db_id, sql_content)
+
+        # 获取提交的SQL 语句
 
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
@@ -102,13 +95,19 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             request_data['type'] = self.type_select_tag
         else:
             # inception 执行返回的结果
-            handle_result = self.check_execute_sql(request_data.get('db'), sql_content, self.action_type_check)[-1]
+            handle_result = self.check_execute_sql(db_id, sql_content, self.action_type_check)[-1]
 
         # 初始化一个工单
         workorder_serializer = self.serializer_order(data={})
         workorder_serializer.is_valid()
         workorder_instance = workorder_serializer.save()
 
+        # 封装数据
+        request_data['group'] = user_group_id
+        request_data['commiter'] = request.user.username
+        request_data['treater'] = leader_obj.username
+        request_data['users'] = approve_user_list
+        request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程
         request_data['handle_result'] = handle_result
         request_data['workorder'] = workorder_instance.id
         serializer = self.serializer_class(data=request_data)
@@ -116,6 +115,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 保存model
         instance = serializer.save()
         # 筛选审批流程人
-        self.create_step(instance, request_data['workorder'], userlist)
-        # self.mail(instance, self.action_type_check)
+        self.create_step(instance, request_data['workorder'], work_step_list[1:])
+        self.ret['data'] = {"id": instance.id}
         return Response(self.ret)

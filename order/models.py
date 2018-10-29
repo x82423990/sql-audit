@@ -79,6 +79,7 @@ class AuthRules(BaseModel):
         ('developer_supremo', u'总监'),
         ('developer_manager', u'经理'),
         ('developer', u'研发'),
+        ('admin', u'admin'),
     )
     ENVS = (
         ('prd', u'生产环境'),

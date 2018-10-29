@@ -32,6 +32,7 @@ class PromptMxins(object):
     require_handleable = '该工单未审批通过，无法操作'
     require_different = '执行人和审批人相同，无法操作'
     require_same = '您不是该工单的审批人，无法审批'
+    require_commiter = '你不是该工单的执行者'
     type_warning = '回滚类型错误(SELECT)'
     old_password_warning = '旧密码错误'
     new_rep_password_warning = '重复密码错误'

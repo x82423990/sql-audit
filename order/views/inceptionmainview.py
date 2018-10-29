@@ -29,7 +29,6 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             return queryset.filter(createtime__range=date_range.split(','))
         return queryset
 
-
     def get_queryset(self):
         userobj = self.request.user
         print(userobj, userobj.role)
@@ -42,45 +41,38 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         return self.filter_date(query_set)
 
     def check_and_set_approve_status(self, instance, status_code):
-        # step_instance = instance.workorder.step_set.all()[1]
-        # process = instance.workorder.step_set.all > 3
-        # # step_instance = process[1] if process else None
-        # if not process:
-        #     raise ParseError(self.approve_warning)
         user = self.request.user
-        print("审核用户", user.username)
         try:
             stepobj = instance.workorder.step_set.get(user_id=user.id)
         except ObjectDoesNotExist:
             raise ParseError("你没有改工单的审批权限")
-
         # 求上级
         prestep = instance.workorder.step_set.filter(pk=stepobj.id - 1)[0] if instance.workorder.step_set.filter(
             pk=stepobj.id - 1) else None
         # 求下级
         nexsetp = instance.workorder.step_set.filter(pk=stepobj.id + 1)[0] if instance.workorder.step_set.filter(
             pk=stepobj.id + 1) else None
-        print("--%s---%s----%s---" % (stepobj, prestep, nexsetp))
         if stepobj.status != 0:
             raise ParseError(self.approve_warning)
 
         if prestep and prestep.status != 1:
-            raise ParseError("你的上级还没有审批")
+            raise ParseError("组长/经理还没有审批完成!")
 
-        # 判断是否有上级
-        if nexsetp:
-            instance.up = True
-        else:
-            # 没有上级直接改变状态
-            instance.workorder.status = True
-        # 改变自己步骤的状态
-        instance.workorder.save()
-        instance.save()
-        stepobj.status = status_code
+        if status_code == 1:
+            # 判断是否有上级
+            if nexsetp:
+                instance.up = True
+            else:
+                # 没有上级直接改变状态
+                instance.workorder.status = True
+            # 改变自己步骤的状态
+            instance.workorder.save()
+            instance.save()
+            stepobj.status = status_code
+        # 拒绝工单
+        elif status_code == 2:
+            stepobj.status = status_code
         stepobj.save()
-
-    def set_approve_status(self, instance):
-        pass
 
     def filter_select_type(self, instance):
         type = instance.type
@@ -90,12 +82,10 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
     def handle_approve(self, call_type, status, step_number):
         instance = self.get_object()
         if self.has_flow(instance):
+            #  call_type 1 为审批, status 为审批状态
             if call_type == 1:
                 self.check_and_set_approve_status(instance, status)
-                # if status == 1:
-                #     instance.workorder.status = True
-                #     instance.workorder.save()
-            # print("rage afer", instance.workorder.step_set.order_by('id'))
+
             step_instance = instance.workorder.step_set.order_by('id')[step_number]
             # step_instance.status = status
             # step_instance.save()
@@ -114,7 +104,9 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             self.ret = {'status': -2, 'msg': self.executed}
             return Response(self.ret)
         affected_rows = 0
+        #  工单的status 状态设置为0,0代表执行成功
         instance.status = 0
+        # 如果为查询语句
         if instance.type == self.type_select_tag:
             sql_query = SqlQuery(instance.db)
             data = sql_query.main(instance.sql_content)
@@ -133,6 +125,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 opids.append(success_sql[7].replace("'", ""))
             # 如果返回的列表有值，代表inception执行失败，并返回执行失败的错误
             if exception_sqls:
+                # 如果执行设置， 将工单的状态status =2
                 instance.status = 2
                 instance.execute_errors = exception_sqls
                 self.ret['status'] = -1
@@ -142,9 +135,9 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             self.ret['data']['execute_time'] = '%.3f' % execute_time
         instance.exe_affected_rows = affected_rows
         self.ret['data']['affected_rows'] = affected_rows
+        # 邮件通知
         # self.mail(instance, self.action_type_execute)
         self.replace_remark(instance)
-        # self.handle_approve(2, 1, 2)
         print(self.ret)
         return Response(self.ret)
 
@@ -162,7 +155,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         self.handle_approve(1, 1, 1)
         return Response(self.ret)
 
-    @detail_route()
+    @action(detail=True)
     def disapprove(self, request, *args, **kwargs):
         self.handle_approve(1, 2, 1)
         return Response(self.ret)

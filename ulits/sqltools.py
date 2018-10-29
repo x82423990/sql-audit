@@ -29,12 +29,21 @@ class Inception(object):
             cur = conn.cursor()
             cur.execute(sql)
             result = cur.fetchall()
-            cur.close()
             conn.close()
         except pymysql.Error as e:
             status = -1
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
         return {'result': result, 'status': status}
+
+    def rows_effect(self, dbaddr):
+        try:
+            conn = MySQLdb.connect(dbaddr)
+        except Exception as e:
+            raise e
+        cur = conn.cursor()
+        line = cur.execute(self.sql)
+        conn.close()
+        return line
 
     def manual(self):  # 查询回滚库/表
         conn = pymysql.connect(host=self.inception_ipaddr, port=self.port, user=self.user, passwd=self.passwd,

@@ -30,19 +30,22 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
         role = self.admin if user.is_superuser else user.role
         uri_list = request.META['PATH_INFO'].split('/')
         uri = uri_list[-2]
+        print("URI", uri)
         if (
                 request.method in SAFE_METHODS and uri not in reject_perms + approve_perms + handle_perms) or env == self.env_test:
             return True
-        if obj.is_manual_review == True:
-            approve_step_instance = obj.workorder.step_set.all()[1]
-            approve_user = approve_step_instance.user
+        if obj.is_manual_review:
+            approve_step_instance = obj.workorder.step_set.all()
+            approve_user_lists = [i.user_id for i in approve_step_instance]
             if uri in handle_perms:
                 if not obj.workorder.status:
                     raise PermissionDenied(PromptMxins.require_handleable)
-                if approve_user == user:
-                    raise PermissionDenied(PromptMxins.require_different)
+                # if user.id not in approve_user_lists:
+                #     raise PermissionDenied(PromptMxins.require_different)
+                if obj.commiter != request.user.username:
+                    raise PermissionDenied(PromptMxins.require_commiter)
             elif uri in approve_perms:
-                if approve_user != user:
+                if user.id not in approve_user_lists:
                     raise PermissionDenied(PromptMxins.require_same)
         if uri in reject_perms:
             current_step = ActionMxins.get_current_step(obj)
@@ -52,8 +55,11 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
 
     def check_perm(self, env, is_manual_review, role, uri):
         try:
+            print(env, role)
             perm_obj = AuthRules.objects.get(env=env, is_manual_review=is_manual_review, role=role)
+            # 如果是json 则需要些data=
             perm_serializer = AuthRulesSerializer(perm_obj)
             return perm_serializer.data.get(uri)
         except Exception as e:
+            print(e)
             return False
