@@ -40,7 +40,7 @@ class ActionMxins(AppellationMixins, object):
             instance = Strategy.objects.create()
         return instance.is_manual_review
 
-    def get_db_addr(self, user, password, host, port, actiontype):
+    def get_db_addr(self, user, password, host, port, actiontype=""):
         pc = prpcrypt()
         password = pc.decrypt(password)
         dbaddr = '--user={}; --password={}; --host={}; --port={}; {};'.format(user, password, host, port, actiontype)
@@ -65,12 +65,9 @@ class ActionMxins(AppellationMixins, object):
 
     def check_execute_sql(self, db_id, sql_content, action_type):
         dbobj = Dbconf.objects.get(id=db_id)
-        # print("dbobj----------", dbobj.)
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, action_type)
-        print("db_addr", db_addr)
         sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
         result, status = sql_review.get('result'), sql_review.get('status')
-        print("status", status)
         if status == -1 or len(result) == 1:
             raise ParseError({self.connect_error: result})
         success_sqls = []
@@ -85,10 +82,11 @@ class ActionMxins(AppellationMixins, object):
             raise ParseError({self.exception_sqls: exception_sqls})
         return success_sqls, exception_sqls, json.dumps(result)
 
-    def max_effect_rows(self, db_id, sql_content):
+    @staticmethod
+    def max_effect_rows(db_id, sql_content):
         dbobj = Dbconf.objects.get(id=db_id)
-        db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, actiontype=None)
-        rows = Inception(sql_content, dbobj.name).rows_effect(db_addr)
+        rows = Inception(sql_content, dbobj.name).rows_effect(user=dbobj.user, pwd=dbobj.password, host=dbobj.host,
+                                                              port=int(dbobj.port), db=dbobj.name)
         return rows
 
     def mail(self, sqlobj, mailtype):

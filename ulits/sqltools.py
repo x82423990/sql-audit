@@ -18,11 +18,16 @@ class Inception(object):
         self.passwd = 'Fs9006'
         self.port = 3306
 
+    def decrypt_password(self, password):
+        pc = prpcrypt()
+        return pc.decrypt(password)
+
     def inception_handle(self, dbaddr):
         status = 0
         sql = '/* {} */\
           inception_magic_start;\
           use {}; {} inception_magic_commit;'.format(dbaddr, self.dbname, self.sql)
+        print(sql)
         try:
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception
@@ -35,13 +40,28 @@ class Inception(object):
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
         return {'result': result, 'status': status}
 
-    def rows_effect(self, dbaddr):
+    def rows_effect(self, db, host, pwd, port, user):
         try:
-            conn = MySQLdb.connect(dbaddr)
+            print(host, pwd)
+            password = self.decrypt_password(pwd)
+            print(password)
+            conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port)
         except Exception as e:
             raise e
+
         cur = conn.cursor()
-        line = cur.execute(self.sql)
+        cur.execute("desc %s" % self.sql)
+        table_name = cur.fetchone()[2]
+        newsql = "show table status where name='%s';" % table_name
+        print(newsql)
+        cur = conn.cursor()
+        cur.execute(newsql)
+        engine = cur.fetchone()[1]
+        if engine == "InnoDB":
+            cur = conn.cursor()
+            line = cur.execute(self.sql)
+        else:
+            raise Exception("非InnoDB的表不适用！")
         conn.close()
         return line
 

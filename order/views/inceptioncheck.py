@@ -10,7 +10,6 @@ from order.mixins import ActionMxins
 from order.serializers import *
 from order.models import *
 from account.models import NewGroup
-from ulits.sqltools import Inception
 
 
 class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
@@ -46,7 +45,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     def create_step(self, instance, work_id, users_id):
         # 检查是否需要开启审核
         if self.is_manual_review and instance.env == self.env_prd:
-            instance_id = instance.id
+            # instance_id = instance.id
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
                 status = 0
@@ -63,9 +62,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
 
     def get_step_user(self, userlist, db_id, sql_context):
 
-        self.max_effect_rows()
         # 获取SQL 语句的影响行数
-        rows = 201
+        rows = self.max_effect_rows(db_id, sql_context)
         if rows > 200:
             try:
                 developer_supremo = User.objects.filter(role="developer_supremo")[0]

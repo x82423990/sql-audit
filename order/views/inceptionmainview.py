@@ -86,9 +86,10 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             if call_type == 1:
                 self.check_and_set_approve_status(instance, status)
 
-            step_instance = instance.workorder.step_set.order_by('id')[step_number]
+            # step_instance = instance.workorder.step_set.order_by('id')[step_number]
             # step_instance.status = status
             # step_instance.save()
+            # call_type 3 为拒绝，
             if call_type == 3:
                 steps = instance.workorder.step_set.all()
                 steps_behind = steps.filter(id__gt=step_instance.id)
