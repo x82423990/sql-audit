@@ -23,6 +23,7 @@ class Inception(object):
         return pc.decrypt(password)
 
     def inception_handle(self, dbaddr):
+        print("dbaddrr", dbaddr)
         status = 0
         sql = '/* {} */\
           inception_magic_start;\
@@ -48,7 +49,6 @@ class Inception(object):
             conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port)
         except Exception as e:
             raise e
-
         cur = conn.cursor()
         cur.execute("desc %s" % self.sql)
         table_name = cur.fetchone()[2]

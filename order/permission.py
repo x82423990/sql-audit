@@ -29,6 +29,7 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
         is_manual_review = obj.is_manual_review
         role = self.admin if user.is_superuser else user.role
         uri_list = request.META['PATH_INFO'].split('/')
+        print(uri_list)
         uri = uri_list[-2]
         print("URI", uri)
         if (
@@ -53,7 +54,8 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
             return self.parse_result(current_step in step_rules[role][commiter], PromptMxins.reject_warning)
         return self.check_perm(env, is_manual_review, role, uri)
 
-    def check_perm(self, env, is_manual_review, role, uri):
+    @staticmethod
+    def check_perm(env, is_manual_review, role, uri):
         try:
             print(env, role)
             perm_obj = AuthRules.objects.get(env=env, is_manual_review=is_manual_review, role=role)

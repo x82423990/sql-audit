@@ -82,7 +82,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
     def handle_approve(self, call_type, status, step_number):
         instance = self.get_object()
         if self.has_flow(instance):
-            #  call_type 1 为审批, status 为审批状态
+            #  call_type 1 为审批, status 为审批状态, 1 为allow， 2 reject
             if call_type == 1:
                 self.check_and_set_approve_status(instance, status)
 
@@ -119,6 +119,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
                                                                                  instance.sql_content,
                                                                                  self.action_type_execute)
+            print(success_sqls)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
@@ -138,8 +139,9 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         self.ret['data']['affected_rows'] = affected_rows
         # 邮件通知
         # self.mail(instance, self.action_type_execute)
-        self.replace_remark(instance)
-        print(self.ret)
+        # self.replace_remark(instance)
+        instance.save()
+        print(instance.id)
         return Response(self.ret)
 
     @detail_route()

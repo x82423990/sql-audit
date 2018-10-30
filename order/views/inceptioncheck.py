@@ -114,5 +114,5 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         instance = serializer.save()
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
-        self.ret['data'] = {"id": instance.id}
+        # self.ret['data'] = {"id": instance.id}
         return Response(self.ret)
