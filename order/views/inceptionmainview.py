@@ -89,13 +89,13 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # step_instance = instance.workorder.step_set.order_by('id')[step_number]
             # step_instance.status = status
             # step_instance.save()
-            # call_type 3 为拒绝，
-            if call_type == 3:
-                steps = instance.workorder.step_set.all()
-                steps_behind = steps.filter(id__gt=step_instance.id)
-                for step in steps_behind:
-                    step.status = -1
-                    step.save()
+            # call_type 3 为放弃，
+            # if call_type == 3:
+            #     steps = instance.workorder.step_set.all()
+            #     steps_behind = steps.filter(id__gt=step_instance.id)
+            #     for step in steps_behind:
+            #         step.status = -1
+            #         step.save()
 
     @action(detail=True)
     def execute(self, request, *args, **kwargs):
@@ -119,7 +119,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
                                                                                  instance.sql_content,
                                                                                  self.action_type_execute)
-            print(success_sqls)
+            print("success_sqls", success_sqls)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
