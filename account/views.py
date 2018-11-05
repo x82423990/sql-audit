@@ -70,9 +70,9 @@ class PersonalCenterViewSet(PromptMxins, NewBaseView):
     permission_classes = [IsAuthenticated]
 
     def check_password(self, params):
-        user = authenticate(username=self.request.user.username, password=params.get('old_pass'))
-        if not user:
-            raise ParseError(self.old_password_warning)
+        # user = authenticate(username=self.request.user.username, password=params.get('old_pass'))
+        # if not user:
+        #     raise ParseError(self.old_password_warning)
         new_pass = params.get('new_pass')
         rep_pass = params.get('rep_pass')
         if not (new_pass and rep_pass and new_pass == rep_pass):
@@ -89,7 +89,7 @@ class PersonalCenterViewSet(PromptMxins, NewBaseView):
         print(request_data)
         new_pass = self.check_password(request_data)
         instance = request.user
-        instance.email = request_data.get("email")
+        # instance.email = request_data.get("email")
         instance.set_password(new_pass)
         instance.save()
         return Response(self.ret)
