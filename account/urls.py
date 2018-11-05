@@ -21,7 +21,7 @@ from .views import *
 
 router = DefaultRouter()
 router.register(r'permissions', PermissionsViewSet)
-router.register(r'personal', PermissionsViewSet, base_name='PersonalCenterViewSet')
+router.register(r'personal', PersonalCenterViewSet, base_name='PersonalCenterViewSet')
 router.register(r'users', NewInfo)
 router.register(r'groups', DepartmentInfo)
 urlpatterns = [

@@ -84,6 +84,23 @@ class DepartmentSerializer(serializers.ModelSerializer):
         return ret
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        ret = super(GroupSerializer, self).to_representation(instance)
+        if not isinstance(instance, OrderedDict):
+            qs_perms = instance.permissions.all()
+            perms = [{'id': perm.id, 'name': perm.name} for perm in qs_perms]
+            qs_members = instance.user_set.all()
+            members = [{'id': user.id, 'name': user.username, 'role': user.role} for user in qs_members]
+            ret['perms'] = perms
+            ret['members'] = members
+        return ret
+
+
 class PermissionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission

@@ -43,27 +43,35 @@ class Inception(object):
 
     def rows_effect(self, db, host, pwd, port, user):
         try:
-            print(host, pwd)
             password = self.decrypt_password(pwd)
             print(password)
             conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port)
         except Exception as e:
             raise e
-        cur = conn.cursor()
-        cur.execute("desc %s" % self.sql)
-        table_name = cur.fetchone()[2]
-        newsql = "show table status where name='%s';" % table_name
-        print(newsql)
-        cur = conn.cursor()
-        cur.execute(newsql)
-        engine = cur.fetchone()[1]
-        if engine == "InnoDB":
+
+        sqls = self.sql.replace("\n", "").split(";")[0:-1]
+        print("sqls", sqls)
+        lines = 0
+        for i in sqls:
             cur = conn.cursor()
-            line = cur.execute(self.sql)
-        else:
-            raise Exception("非InnoDB的表不适用！")
+            print("desc %s" % i)
+            cur.execute("desc %s;" % i)
+            # print("cur.fetchone()", cur.fetchall())
+            table_name = cur.fetchone()[2]
+            newsql = "show table status where name='%s';" % table_name
+            print(newsql)
+            cur = conn.cursor()
+            cur.execute(newsql)
+            engine = cur.fetchone()[1]
+            if engine == "InnoDB":
+                cur = conn.cursor()
+                line = cur.execute(i+";")
+                print(line)
+                lines += line
+            else:
+                raise Exception("非InnoDB的表不适用！")
         conn.close()
-        return line
+        return lines
 
     def manual(self):  # 查询回滚库/表
         conn = pymysql.connect(host=self.inception_ipaddr, port=self.port, user=self.user, passwd=self.passwd,
@@ -86,9 +94,6 @@ class Inception(object):
     def get_index_list(self):
         res = self.manual()[3:]
         return [index_info[0] for index_info in res]
-
-    def get_rows_affected(self):
-        return 199
 
 
 class SqlQuery(object):

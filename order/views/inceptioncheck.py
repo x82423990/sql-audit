@@ -10,6 +10,7 @@ from order.mixins import ActionMxins
 from order.serializers import *
 from order.models import *
 from account.models import NewGroup
+from rest_framework import status
 
 
 class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
@@ -39,6 +40,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         if request.data.get('env') == self.env_prd and not request.user.is_superuser:
             if not request.user.groups.exists():
                 raise ParseError(self.not_exists_group)
+            print(request.user.groups.first().id)
             return request.user.groups.first().id
 
     # 工单步骤
@@ -60,10 +62,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             return False
         return strategy_instance.is_manual_review if env == self.env_prd else False
 
-    def get_step_user(self, userlist, db_id, sql_context):
+    def get_step_user(self, userlist, rows):
 
         # 获取SQL 语句的影响行数
-        rows = self.max_effect_rows(db_id, sql_context)
+        # rows = 201
         if rows > 200:
             try:
                 developer_supremo = User.objects.filter(role="developer_supremo")[0]
@@ -75,16 +77,15 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     def create(self, request, *args, **kwargs):
         # 处理 数据
         request_data = request.data
+        print(request.user.username, request.user.id)
         db_id = request_data.get('db')
         sql_content = request_data.get('sql_content')
-
         user_group_id = self.check_user_group(request)
         leader_obj = NewGroup.objects.get(pk=user_group_id).leader
         approve_user_list = [request.user.id, leader_obj.id]
-        work_step_list = self.get_step_user(approve_user_list, db_id, sql_content)
-
+        # 去获取该次提交影响的行数
+        rows = self.max_effect_rows(db_id, sql_content)
         # 获取提交的SQL 语句
-
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
         self.check_forbidden_words(sql_content)
@@ -95,12 +96,15 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             # inception 执行返回的结果
             handle_result = self.check_execute_sql(db_id, sql_content, self.action_type_check)[-1]
 
+        # 判断是否需要副总审核
+        work_step_list = self.get_step_user(approve_user_list, rows)
         # 初始化一个工单
         workorder_serializer = self.serializer_order(data={})
         workorder_serializer.is_valid()
         workorder_instance = workorder_serializer.save()
 
         # 封装数据
+        request_data["exe_affected_rows"] = self.max_effect_rows(db_id, sql_content)
         request_data['group'] = user_group_id
         request_data['commiter'] = request.user.username
         request_data['treater'] = leader_obj.username
@@ -115,4 +119,4 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
         # self.ret['data'] = {"id": instance.id}
-        return Response(self.ret)
+        return Response(self.ret, status=status.HTTP_201_CREATED)

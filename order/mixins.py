@@ -56,7 +56,7 @@ class ActionMxins(AppellationMixins, object):
             sqlobj.remark += '   [' + username + self.action_desc_map.get(uri) + ']'
         if sqlobj.workorder.status:
             steps = sqlobj.workorder.step_set.all()
-            step_obj_second = steps[1]
+            step_obj_second = steps[0]
             if not (self.request.user == step_obj_second.user and uri == 'reject'):
                 step_obj = steps[0]
                 step_obj.user = self.request.user

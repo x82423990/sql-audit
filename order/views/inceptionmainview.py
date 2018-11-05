@@ -13,6 +13,11 @@ from order.serializers import *
 from order.models import *
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.permissions import (
+    IsAdminUser,
+    IsAuthenticated,
+    BasePermission
+)
 
 
 class InceptionMainView(PromptMxins, ActionMxins, BaseView):
@@ -20,7 +25,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         查询：根据登录者身份返回相关的SQL，支持日期/模糊搜索。操作：执行（execute）, 回滚（rollback）,放弃（reject操作）
     '''
     serializer_class = InceptionSerializer
-    permission_classes = [IsHandleAble]
+    permission_classes = [IsAuthenticated, IsHandleAble]
     search_fields = ['commiter', 'sql_content', 'env', 'treater', 'remark']
 
     def filter_date(self, queryset):
@@ -64,15 +69,16 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 instance.up = True
             else:
                 # 没有上级直接改变状态
-                instance.workorder.status = True
+                instance.workorder.status = 1
             # 改变自己步骤的状态
-            instance.workorder.save()
-            instance.save()
             stepobj.status = status_code
         # 拒绝工单
         elif status_code == 2:
             stepobj.status = status_code
+            instance.workorder.status = status_code
+        instance.workorder.save()
         stepobj.save()
+        instance.save()
 
     def filter_select_type(self, instance):
         type = instance.type
@@ -144,14 +150,14 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         print(instance.id)
         return Response(self.ret)
 
-    @detail_route()
-    def reject(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.status = 1
-        self.replace_remark(instance)
-        role_step = self.get_reject_step(instance)
-        self.handle_approve(3, 3, role_step)
-        return Response(self.ret)
+    # @detail_route()
+    # def reject(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     instance.status = 1
+    #     self.replace_remark(instance)
+    #     role_step = self.get_reject_step(instance)
+    #     self.handle_approve(3, 3, role_step)
+    #     return Response(self.ret)
 
     @action(detail=True)
     def approve(self, request, *args, **kwargs):

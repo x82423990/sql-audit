@@ -34,7 +34,7 @@ class InceptionSerializer(serializers.ModelSerializer):
                     'status': step.status
                 }
             )
-        data.insert(0, {'updatetime': instance.createtime, 'username': 'Inception', 'group': '自动审核', 'status': 1})
+        data.insert(0, {'id': 0, 'updatetime': instance.createtime, 'username': '系统审核', 'status': 1})
         return data
 
     # 返回样式

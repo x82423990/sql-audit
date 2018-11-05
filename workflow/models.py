@@ -9,7 +9,7 @@ from ulits.basemodel import BaseModel
 # Create your models here.
 
 class WorkOrder(BaseModel):
-    status = models.BooleanField(default=False, verbose_name='审批状态')
+    status = models.IntegerField(default=0, verbose_name='审批状态')
 
 
 class Step(BaseModel):
