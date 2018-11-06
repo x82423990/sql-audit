@@ -26,7 +26,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
     '''
     serializer_class = InceptionSerializer
     permission_classes = [IsAuthenticated, IsHandleAble]
-    search_fields = ['commiter', 'sql_content', 'env', 'treater', 'remark']
+    search_fields = ['status']
 
     def filter_date(self, queryset):
         date_range = self.request.GET.get('daterange')

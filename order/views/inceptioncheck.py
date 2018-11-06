@@ -64,15 +64,21 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         return strategy_instance.is_manual_review if env == self.env_prd else False
 
     # 判断是否大于200行
-    def get_step_user(self, userlist, rows):
+    def get_step_user(self, instance, userlist, rows):
 
         # 获取SQL 语句的影响行数
         # rows = 201
+        userlist = list(set(userlist))
+        try:
+            developer_supremo = User.objects.filter(role="developer_supremo")[0]
+        except IndexError:
+            raise ParseError("当前实例中没有副总角色")
+
+        if len(userlist) == 1:
+            instance.up = True
+            instance.save()
+            userlist.append(developer_supremo.id)
         if rows > 200:
-            try:
-                developer_supremo = User.objects.filter(role="developer_supremo")[0]
-            except IndexError:
-                raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
         return userlist
 
@@ -99,8 +105,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             # inception 执行返回的结果
             handle_result = self.check_execute_sql(db_id, sql_content, self.action_type_check)[-1]
 
-        # 判断是否需要副总审核
-        work_step_list = self.get_step_user(approve_user_list, rows)
         # 初始化一个工单
         workorder_serializer = self.serializer_order(data={})
         workorder_serializer.is_valid()
@@ -119,6 +123,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         serializer.is_valid(raise_exception=True)
         # 保存model
         instance = serializer.save()
+        # 判断是否需要副总审核
+        work_step_list = self.get_step_user(instance, approve_user_list, rows)
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
         # self.ret['data'] = {"id": instance.id}
