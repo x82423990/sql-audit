@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'audit.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'audit3',
+        'NAME': 'audit4',
         'USER': 'root',
         'PASSWORD': 'Fs9006',
         'HOST': '172.17.69.231',
