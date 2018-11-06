@@ -56,12 +56,14 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
                 step_serializer.is_valid(raise_exception=True)
                 step_serializer.save()
 
+    # 判断是否需要审核
     def get_strategy_is_manual_review(self, env):
         strategy_instance = Strategy.objects.first()
         if not strategy_instance:
             return False
         return strategy_instance.is_manual_review if env == self.env_prd else False
 
+    # 判断是否大于200行
     def get_step_user(self, userlist, rows):
 
         # 获取SQL 语句的影响行数
@@ -74,10 +76,11 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             userlist.append(developer_supremo.id)
         return userlist
 
+    # 重写create 方法
     def create(self, request, *args, **kwargs):
         # 处理 数据
         request_data = request.data
-        print(request.user.username, request.user.id)
+
         db_id = request_data.get('db')
         sql_content = request_data.get('sql_content')
         user_group_id = self.check_user_group(request)

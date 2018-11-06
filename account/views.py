@@ -22,9 +22,13 @@ from ulits.basemixins import PromptMxins
 from rest_framework.exceptions import ParseError
 from rest_framework_jwt.views import JSONWebTokenAPIView
 from datetime import datetime
+from rest_framework.exceptions import ParseError
+from rest_framework.decorators import action
+
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
+
 
 class NewInfo(NewBaseView):
     '''
@@ -94,5 +98,14 @@ class PersonalCenterViewSet(PromptMxins, NewBaseView):
         instance.save()
         return Response(self.ret)
 
-
-
+    @action(detail=True, methods=['put'])
+    def chang_mail(self, request, *args, **kwargs):
+        request_data = request.data
+        instance = request.user
+        try:
+            instance.email = request_data.get("email")
+        except Exception as e:
+            raise ParseError(e)
+        instance.save()
+        print(instance.email, instance.username)
+        return Response(self.ret)
