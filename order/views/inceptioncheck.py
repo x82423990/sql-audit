@@ -69,16 +69,20 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 获取SQL 语句的影响行数
         # rows = 201
         userlist = list(set(userlist))
-        try:
-            developer_supremo = User.objects.filter(role="developer_supremo")[0]
-        except IndexError:
-            raise ParseError("当前实例中没有副总角色")
 
         if len(userlist) == 1:
+            try:
+                developer_supremo = User.objects.filter(role="developer_supremo")[0]
+            except IndexError:
+                raise ParseError("当前实例中没有副总角色")
             instance.up = True
             instance.save()
             userlist.append(developer_supremo.id)
         if rows > 200:
+            try:
+                developer_supremo = User.objects.filter(role="developer_supremo")[0]
+            except IndexError:
+                raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
         return userlist
 
