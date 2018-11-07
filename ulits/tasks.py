@@ -33,8 +33,10 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
     msg['To'] = ";".join(to_list)
     try:
         s = smtplib.SMTP()
+        print("start connect")
         s.connect(mail_host, 25)  # 连接smtp服务器
-        s.starttls()
+        print("end connect")
+        # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
         s.sendmail(me, to_list, msg.as_string())  # 发送邮件
         s.close()
