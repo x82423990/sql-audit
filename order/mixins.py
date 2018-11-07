@@ -100,4 +100,4 @@ class ActionMxins(AppellationMixins, object):
             mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
             print(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content)
             send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
-                            sqlobj.db.name)
+                            sqlobj.db_name)
