@@ -57,7 +57,10 @@ class UserSerializer(serializers.ModelSerializer):
     # 重写update 方法，
     def update(self, instance, validated_data):
         validated_data.pop('password')
-        newpassword = validated_data.pop('newpassword') or None
+        try:
+            newpassword = validated_data.pop('newpassword')
+        except KeyError:
+            newpassword = None
         if newpassword:
             instance.set_password(newpassword)
         # validated_data = self.update_sysaccount(validated_data)
