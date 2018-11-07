@@ -28,7 +28,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
     if len(sqlcontent) > 1024:
         sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
     # me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
-    me = "<mail_postfix>"  # 这里的hello可以任意设置，收到信后，将按照设置显示
+    me = "<"'hulala'+'@'+'DbApprove.com'">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     msg = MIMEText(contenthtml + sqlhtml, _subtype='html', _charset='utf-8')  # 创建一个实例，这里设置为html格式邮件
     msg['Subject'] = '{} {} [{}]'.format(personnel, title, note)  # 设置主题
     msg['From'] = me
