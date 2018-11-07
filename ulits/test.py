@@ -1,8 +1,6 @@
 import MySQLdb
 import subprocess
 import pymysql
-from rest_framework.exceptions import ParseError
-from .dbcrypt import prpcrypt
 
 
 # sql = '/*--user=applist;--password=Fs9006;--host=172.16.130.202;--port=3306;--enable-check;*/\
@@ -123,3 +121,28 @@ class SqlQuery(object):
 # UPDATE test SET count=500 WHERE address="jrc";\
 # inception_magic_commit;'
 # conn(sqll)
+
+if __name__ == '__main__':
+    import random
+
+    import string
+
+    tmp = "wucai"
+    conn = MySQLdb.connect(user="root", host="120.79.128.26", password="Fs9006", db="test", port=3306)
+    cur = conn.cursor()
+    # sqls = 'INSERT INTO info(username,sex,money) VALUES("%s",1,3306)' % tmp
+    # cur = conn.cursor()
+    # ret = cur.execute(sqls)
+    # conn.commit()
+    # cur.close()
+    for i in range(1000):
+        name = ''.join(random.sample(string.ascii_letters + string.digits, 4))
+        a = [1, 2]
+        b = random.sample(a, 1)[0]
+        money = random.randint(100, 100000)
+        print(name, b, money)
+        sqls = 'INSERT INTO info(username,sex,money) VALUES("%s",%d,%d)' % (name, b, money)
+        # cur = conn.cursor()
+        ret = cur.execute(sqls)
+    conn.commit()
+    conn.close()

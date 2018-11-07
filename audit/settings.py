@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import datetime
-
+import djcelery
+from celery import Celery, platforms
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -32,6 +33,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# djcelery
+platforms.C_FORCE_ROOT = True
+djcelery.setup_loader()
+BROKER_URL = 'redis://172.17.69.231:6379/0'  # redis broker
+CELERY_RESULT_BACKEND = 'redis://172.17.69.231:6379/1'  # redis backend
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Los_Angeles'
+CELERY_ENABLE_UTC = True
+CELERY_IMPORTS = ("utils.tasks",)
 # Application definition
 
 INSTALLED_APPS = [

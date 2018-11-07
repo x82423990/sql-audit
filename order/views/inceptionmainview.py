@@ -12,6 +12,7 @@ from order.permission import IsHandleAble
 from order.serializers import *
 from order.models import *
 from django.db.models import Q
+from pymysql import err
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import (
     IsAdminUser,
@@ -116,7 +117,12 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         # 如果为查询语句
         if instance.type == self.type_select_tag:
             sql_query = SqlQuery(instance.db)
+
             data = sql_query.main(instance.sql_content)
+            if data is None:
+                instance.status = 2
+                instance.save()
+                raise ParseError("执行失败！")
             affected_rows = len(data)
             instance.handle_result = json.dumps([list(row) for row in data], cls=DateEncoder)
         else:

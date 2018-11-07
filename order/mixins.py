@@ -91,11 +91,12 @@ class ActionMxins(AppellationMixins, object):
 
     def mail(self, sqlobj, mailtype):
         if sqlobj.env == self.env_prd:
+            print("--他和在执行")
             username = self.request.user.username
-            treater = sqlobj.treater
+            treater = sqlobj.treater if username != sqlobj.treater else User.objects.filter(role="developer_supremo")[0]
             commiter = sqlobj.commiter
             mailto_users = [treater, commiter]
             mailto_users = list(set(mailto_users))
             mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
-            send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.remark, mailtype, sqlobj.sql_content,
+            send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
                             sqlobj.db.name)

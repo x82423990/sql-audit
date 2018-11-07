@@ -5,6 +5,7 @@ import MySQLdb
 
 from rest_framework.exceptions import ParseError
 from .dbcrypt import prpcrypt
+from pymysql.err import ProgrammingError
 
 
 class Inception(object):
@@ -31,7 +32,10 @@ class Inception(object):
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception
             cur = conn.cursor()
-            cur.execute(sql)
+            try:
+                cur.execute(sql)
+            except ProgrammingError as e:
+                print(e)
             result = cur.fetchall()
             conn.close()
         except pymysql.Error as e:
@@ -107,7 +111,11 @@ class SqlQuery(object):
             raise ParseError(e)
         conn.autocommit(True)
         cur = conn.cursor()
-        cur.execute(sql)
+        try:
+            cur.execute(sql)
+        except ProgrammingError as e:
+            print(e)
+            return None
         return cur.fetchall()
 
     def get_tables(self):

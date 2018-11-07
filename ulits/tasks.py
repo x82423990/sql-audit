@@ -3,14 +3,15 @@ from celery import task
 import smtplib
 from email.mime.text import MIMEText
 
-mail_host = "email.aaa.com"  # 设置服务器
-mail_user = "user1"  # 用户名
-mail_pass = "passwd1"  # 密码
-mail_postfix = "aaa.com"  # 发件箱的后缀
+mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
+mail_user = "zabbix@9ffenqigo.com"  # 用户名
+mail_pass = "bycx.40450"  # 密码
+mail_postfix = "猴嘴测试"  # 发件箱的后缀
 
 
 @task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
+    print("我在执行！！")
     if action_type == '--enable-check':
         title = '提交了 SQL-{}'.format(sqlid)
     elif action_type == '--enable-execute':
@@ -31,7 +32,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
     msg['To'] = ";".join(to_list)
     try:
         s = smtplib.SMTP()
-        s.connect(mail_host, 587)  # 连接smtp服务器
+        s.connect(mail_host, 465)  # 连接smtp服务器
         s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
         s.sendmail(me, to_list, msg.as_string())  # 发送邮件
