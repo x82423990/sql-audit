@@ -11,7 +11,7 @@ mail_postfix = "猴嘴测试"  # 发件箱的后缀
 
 @task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
-    print("我在执行！！,", [to_list, personnel, sqlid, note, action_type, sqlcontent, dbname])
+    print("我在执行！！,,,,,,,,,,,", [to_list, personnel, sqlid, note, action_type, sqlcontent, dbname])
     if action_type == '--enable-check':
         title = '提交了 SQL-{}'.format(sqlid)
     elif action_type == '--enable-execute':
