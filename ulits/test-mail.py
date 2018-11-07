@@ -34,8 +34,8 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
     msg['To'] = ";".join(to_list)
     try:
         print("我开始经连接")
-        s = smtplib.SMTP()
-        s.connect(host=mail_host, port=25)  # 连接smtp服务器
+        s = smtplib.SMTP(host=mail_host, port=25, timeout=1)
+        # s.connect(mail_host, 5)  # 连接smtp服务器
         print("我已经连接")
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
