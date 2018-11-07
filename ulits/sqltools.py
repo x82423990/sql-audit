@@ -23,12 +23,10 @@ class Inception(object):
         return pc.decrypt(password)
 
     def inception_handle(self, dbaddr):
-        print("dbaddrr", dbaddr)
         status = 0
         sql = '/* {} */\
           inception_magic_start;\
           use {}; {} inception_magic_commit;'.format(dbaddr, self.dbname, self.sql)
-        print(sql)
         try:
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception
@@ -44,29 +42,24 @@ class Inception(object):
     def rows_effect(self, db, host, pwd, port, user):
         try:
             password = self.decrypt_password(pwd)
-            print(password)
             conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port)
         except Exception as e:
             raise e
 
         sqls = self.sql.replace("\n", "").split(";")[0:-1]
-        print("sqls", sqls)
         lines = 0
         for i in sqls:
             cur = conn.cursor()
-            print("desc %s" % i)
             cur.execute("desc %s;" % i)
             # print("cur.fetchone()", cur.fetchall())
             table_name = cur.fetchone()[2]
             newsql = "show table status where name='%s';" % table_name
-            print(newsql)
             cur = conn.cursor()
             cur.execute(newsql)
             engine = cur.fetchone()[1]
             if engine == "InnoDB":
                 cur = conn.cursor()
                 line = cur.execute(i+";")
-                print(line)
                 lines += line
             else:
                 raise Exception("非InnoDB的表不适用！")

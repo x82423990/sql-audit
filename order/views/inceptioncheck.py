@@ -46,8 +46,11 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     # 工单步骤
     def create_step(self, instance, work_id, users_id):
         # 检查是否需要开启审核
+        print("检查是否需要开启审核")
+        print(self.is_manual_review and instance.env == self.env_prd)
         if self.is_manual_review and instance.env == self.env_prd:
             # instance_id = instance.id
+            print("users_id", users_id)
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
                 status = 0
@@ -69,7 +72,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 获取SQL 语句的影响行数
         # rows = 201
         userlist = list(set(userlist))
-
         if len(userlist) == 1:
             try:
                 developer_supremo = User.objects.filter(role="developer_supremo")[0]
@@ -84,6 +86,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             except IndexError:
                 raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
+        print("userlist", userlist)
         return userlist
 
     # 重写create 方法
