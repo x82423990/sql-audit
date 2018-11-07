@@ -35,7 +35,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
         # s = smtplib.SMTP(timeout=5)
         print("start connect")
         # s.connect(mail_host, 25, )  # 连接smtp服务器
-        s = smtplib.SMTP(host=mail_host, port=25, timeout=1)
+        s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
         print("end connect")
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
