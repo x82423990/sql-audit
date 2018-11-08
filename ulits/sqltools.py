@@ -6,7 +6,9 @@ import MySQLdb
 from rest_framework.exceptions import ParseError
 from .dbcrypt import prpcrypt
 from pymysql.err import ProgrammingError
-from _mysql_exceptions import OperationalError
+from _mysql_exceptions import OperationalError, ProgrammingError
+
+
 class Inception(object):
 
     def __init__(self, sql, dbname=''):
@@ -55,7 +57,7 @@ class Inception(object):
             cur = conn.cursor()
             try:
                 cur.execute("desc %s;" % i)
-            except OperationalError as e:
+            except (OperationalError, ProgrammingError) as e:
                 raise ParseError(e)
             # print("cur.fetchone()", cur.fetchall())
             table_name = cur.fetchone()[2]
@@ -65,7 +67,7 @@ class Inception(object):
             engine = cur.fetchone()[1]
             if engine == "InnoDB":
                 cur = conn.cursor()
-                line = cur.execute(i+";")
+                line = cur.execute(i + ";")
                 lines += line
             else:
                 raise Exception("非InnoDB的表不适用！")
