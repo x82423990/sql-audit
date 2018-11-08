@@ -27,7 +27,7 @@ class DbViewSet(ActionMxins, BaseView):
             queryset = Dbconf.objects.all().order_by('-createtime')
         return queryset
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True)
     def connect(self, request, *args, **kwargs):
         instance = self.get_object()
         print(instance.id)
