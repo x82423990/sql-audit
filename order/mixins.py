@@ -89,6 +89,16 @@ class ActionMxins(AppellationMixins, object):
                                                               port=int(dbobj.port), db=dbobj.name)
         return rows
 
+    @staticmethod
+    def test_connect(db_id):
+        dbobj = Dbconf.objects.get(id=db_id)
+        try:
+            ret = Inception().rows_effect(user=dbobj.user, pwd=dbobj.password, host=dbobj.host,
+                                          port=int(dbobj.port), db=dbobj.name, test=True)
+            return ret
+        except Exception as e:
+            raise ParseError("host %s connected timeout" % dbobj.host)
+
     def mail(self, sqlobj, mailtype):
         if sqlobj.env == self.env_prd:
             print("--他和在执行")

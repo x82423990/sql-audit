@@ -7,9 +7,12 @@ from rest_framework.permissions import (
     IsAuthenticated,
     BasePermission
 )
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from order.mixins import ActionMxins
 
 
-class DbViewSet(BaseView):
+class DbViewSet(ActionMxins, BaseView):
     # queryset = Dbconf.objects.all()
     serializer_class = DbSerializer
     # permission_classes = None
@@ -23,3 +26,11 @@ class DbViewSet(BaseView):
         else:
             queryset = Dbconf.objects.all().order_by('-createtime')
         return queryset
+
+    @action(detail=True, methods=["post"])
+    def connect(self, request, *args, **kwargs):
+        instance = self.get_object()
+        print(instance.id)
+        self.test_connect(instance.id)
+        return Response(self.ret)
+

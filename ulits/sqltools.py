@@ -11,7 +11,7 @@ from _mysql_exceptions import OperationalError, ProgrammingError
 
 class Inception(object):
 
-    def __init__(self, sql, dbname=''):
+    def __init__(self, sql=None, dbname=''):
         self.sql = sql
         self.dbname = dbname
         # Inception 数据库地址，用户，密码，端口
@@ -44,13 +44,16 @@ class Inception(object):
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
         return {'result': result, 'status': status}
 
-    def rows_effect(self, db, host, pwd, port, user):
-        try:
-            password = self.decrypt_password(pwd)
-            conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port)
-        except Exception as e:
-            raise e
+    def rows_effect(self, db, host, pwd, port, user, test=None):
+        # try:
+        password = self.decrypt_password(pwd)
+        conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port, connect_timeout=5)
+        # except (Exception, OperationalError) as e:
+        #     raise e
 
+        # 测试连通性
+        if test is not None:
+            return True
         sqls = self.sql.replace("\n", "").split(";")[0:-1]
         lines = 0
         for i in sqls:
