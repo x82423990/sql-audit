@@ -36,8 +36,8 @@ ALLOWED_HOSTS = ['*']
 # djcelery
 platforms.C_FORCE_ROOT = True
 djcelery.setup_loader()
-BROKER_URL = 'redis://172.17.69.231:6379/0'  # redis broker
-CELERY_RESULT_BACKEND = 'redis://172.17.69.231:6379/1'  # redis backend
+BROKER_URL = 'redis://127.0.0.1:6379/0'  # redis broker
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # redis backend
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Los_Angeles'
