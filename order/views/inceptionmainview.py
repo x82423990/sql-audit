@@ -81,6 +81,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             stepobj.status = status_code
             instance.workorder.status = status_code
         instance.workorder.save()
+        nexsetp.save()
         stepobj.save()
         instance.save()
 
