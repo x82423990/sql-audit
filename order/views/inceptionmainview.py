@@ -78,9 +78,10 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 如果驳回， 也把上级的状态改为终止
             if nexsetp:
                 nexsetp.status = -1
+                nexsetp.save()
             stepobj.status = status_code
             instance.workorder.status = status_code
-            nexsetp.save()
+
         instance.workorder.save()
         stepobj.save()
         instance.save()
