@@ -75,6 +75,9 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             stepobj.status = status_code
         # 拒绝工单
         elif status_code == 2:
+            # 如果驳回， 也把上级的状态改为终止
+            if nexsetp:
+                nexsetp.status = -1
             stepobj.status = status_code
             instance.workorder.status = status_code
         instance.workorder.save()
