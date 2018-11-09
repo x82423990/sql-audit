@@ -101,6 +101,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         user_group_id = self.check_user_group(request)
         try:
             leader_obj = NewGroup.objects.get(pk=user_group_id).leader
+            print(leader_obj.username)
         except Exception as e:
             raise ParseError(self.not_group)
         approve_user_list = [request.user.id, leader_obj.id]
@@ -130,10 +131,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         request_data["exe_affected_rows"] = self.max_effect_rows(db_id, sql_content)
         request_data['group'] = user_group_id
         request_data['commiter'] = request.user.username
-        try:
-            request_data['treater'] = leader_obj.username
-        except Exception as e:
-            raise ParseError(self.not_group)
+        request_data['treater'] = leader_obj.username
         request_data['users'] = approve_user_list
         request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程
         request_data['handle_result'] = handle_result
