@@ -42,7 +42,7 @@ class Inceptsql(BaseModel):
     users = models.ManyToManyField(User)
     group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.CASCADE)
     db = models.ForeignKey(Dbconf, on_delete=models.CASCADE)
-    workorder = models.OneToOneField(WorkOrder, on_delete=models.CASCADE)  # 工单状态
+    workorder = models.OneToOneField(WorkOrder, on_delete=models.PROTECT)  # 工单状态
     is_manual_review = models.BooleanField(default=False, verbose_name='有流程')
     commiter = models.CharField(max_length=32, null=True, blank=True)
     sql_content = models.TextField()
