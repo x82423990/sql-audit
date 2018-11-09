@@ -10,6 +10,7 @@ from rest_framework.permissions import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from order.mixins import ActionMxins
+from rest_framework.exceptions import ParseError
 
 
 class DbViewSet(ActionMxins, BaseView):
@@ -27,10 +28,16 @@ class DbViewSet(ActionMxins, BaseView):
             queryset = Dbconf.objects.all().order_by('-createtime')
         return queryset
 
+    def perform_destroy(self, instance):
+        print("-----------------------------执行了么------------------------------")
+        try:
+            instance.delete()
+        except Exception as e:
+            raise ParseError(e)
+
     @action(detail=True)
     def connect(self, request, *args, **kwargs):
         instance = self.get_object()
         print(instance.id)
         self.test_connect(instance.id)
         return Response(self.ret)
-
