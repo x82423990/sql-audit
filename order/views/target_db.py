@@ -29,11 +29,10 @@ class DbViewSet(ActionMxins, BaseView):
         return queryset
 
     def perform_destroy(self, instance):
-        print("-----------------------------执行了么------------------------------")
         try:
             instance.delete()
-        except Exception as e:
-            raise ParseError(e)
+        except Exception:
+            raise ParseError("不能删除有工单依赖的数据库！")
 
     @action(detail=True)
     def connect(self, request, *args, **kwargs):
