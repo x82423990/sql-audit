@@ -101,10 +101,11 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         user_group_id = self.check_user_group(request)
         try:
             leader_obj = NewGroup.objects.get(pk=user_group_id).leader
-            print(leader_obj.username)
+            print('--------------------------', leader_obj.username)
         except Exception as e:
             raise ParseError(self.not_group)
         approve_user_list = [request.user.id, leader_obj.id]
+        print('approve_user_list', approve_user_list)
         # 去获取该次提交影响的行数
         try:
             rows = self.max_effect_rows(db_id, sql_content)
