@@ -36,3 +36,4 @@ class PromptMxins(object):
     type_warning = '回滚类型错误(SELECT)'
     old_password_warning = '旧密码错误'
     new_rep_password_warning = '重复密码错误'
+    not_group = '你不能提交工单，因为你没有领导Txx'
