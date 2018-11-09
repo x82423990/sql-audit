@@ -95,6 +95,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         request_data = request.data
 
         db_id = request_data.get('db')
+        # 检查数据库是否可达
+        self.test_connect(db_id)
         sql_content = request_data.get('sql_content')
         user_group_id = self.check_user_group(request)
         try:
