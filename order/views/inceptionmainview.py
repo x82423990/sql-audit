@@ -48,6 +48,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
     def perform_destroy(self, instance):
         try:
+            print("执行了么")
             instance.delete()
         except Exception as e:
             raise ParseError(e)
