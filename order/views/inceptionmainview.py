@@ -43,7 +43,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             return self.filter_date(Inceptsql.objects.all())
         if userobj.role == self.dev_spm:
             return self.filter_date(Inceptsql.objects.filter(Q(status=0) | Q(up=True)))
-        query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
+        query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all() or \
+                                                                                                    userobj.inceptsql_set.all()
         return self.filter_date(query_set)
 
     def check_and_set_approve_status(self, instance, status_code):
