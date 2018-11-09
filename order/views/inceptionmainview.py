@@ -47,8 +47,9 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         return self.filter_date(query_set)
 
     def perform_destroy(self, instance):
+        print("执行了么")
         try:
-            print("执行了么")
+
             instance.delete()
         except Exception as e:
             raise ParseError(e)
