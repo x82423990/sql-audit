@@ -109,8 +109,9 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
         self.check_forbidden_words(sql_content)
         if bool(select):
-            handle_result = None
-            request_data['type'] = self.type_select_tag
+            raise ParseError(self.forbidden_select)
+            # handle_result = None
+            # request_data['type'] = self.type_select_tag
         else:
             # inception 执行返回的结果
             handle_result = self.check_execute_sql(db_id, sql_content, self.action_type_check)[-1]

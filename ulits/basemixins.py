@@ -37,3 +37,4 @@ class PromptMxins(object):
     old_password_warning = '旧密码错误'
     new_rep_password_warning = '重复密码错误'
     not_group = '你不能提交工单，因为你没有领导Txx'
+    forbidden_select = "暂不支持Select语句"
