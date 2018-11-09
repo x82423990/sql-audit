@@ -38,3 +38,4 @@ class PromptMxins(object):
     new_rep_password_warning = '重复密码错误'
     not_group = '你不能提交工单，因为你没有领导Txx'
     forbidden_select = "暂不支持Select语句"
+    not_sucessed_order = "该工单没有执行，不能回滚"

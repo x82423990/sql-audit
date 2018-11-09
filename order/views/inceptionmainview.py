@@ -183,6 +183,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
     @action(detail=True)
     def rollback(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.status != 0:
+            raise ParseError(self.not_sucessed_order)
         self.filter_select_type(instance)
         dbobj = instance.db
         rollback_opid_list = instance.rollback_opid
@@ -195,6 +197,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             back_content = 'select rollback_statement from {} where opid_time = "{}" '.format(back_table, opid)
             back_sqls += Inception(back_content, rollback_db).get_back_sql()
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, self.action_type_execute)
+        # 检查数据库是否可达
+        self.test_connect(instance.db.id)
         execute_results = Inception(back_sqls, dbobj.name).inception_handle(db_addr).get('result')
         instance.status = -3
         instance.roll_affected_rows = self.ret['data']['affected_rows'] = len(execute_results) - 1

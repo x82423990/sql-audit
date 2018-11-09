@@ -29,6 +29,7 @@ class Inception(object):
         sql = '/* {} */\
           inception_magic_start;\
           use {}; {} inception_magic_commit;'.format(dbaddr, self.dbname, self.sql)
+        print("我zai test 回滚", sql)
         try:
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception

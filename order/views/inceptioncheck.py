@@ -103,7 +103,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             raise ParseError(self.not_group)
         approve_user_list = [request.user.id, leader_obj.id]
         # 去获取该次提交影响的行数
-        rows = self.max_effect_rows(db_id, sql_content)
+        try:
+            rows = self.max_effect_rows(db_id, sql_content)
+        except Exception:
+            raise ParseError(self.connect_error)
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
@@ -141,6 +144,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         work_step_list = self.get_step_user(instance, approve_user_list, rows)
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
-        self.mail(instance, self.action_type_check)
-        # self.ret['data'] = {"id": instance.id}
+        # self.mail(instance, self.action_type_check)
+        self.ret['data'] = {"id": instance.id}
         return Response(self.ret, status=status.HTTP_201_CREATED)

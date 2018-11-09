@@ -54,8 +54,22 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def update_sysaccount(self, validated_data):
+        default_account = {
+            'is_active': 0,
+            'is_staff': 0,
+            'is_superuser': 0
+        }
+        sys_account = validated_data.pop('sysaccount', [])
+        for account in sys_account:
+            if account in default_account:
+                default_account[account] = 1
+        validated_data.update(default_account)
+        return validated_data
+
     # 重写update 方法，
     def update(self, instance, validated_data):
+        print("我重写update方法")
         validated_data.pop('password')
         try:
             newpassword = validated_data.pop('newpassword')
@@ -63,7 +77,7 @@ class UserSerializer(serializers.ModelSerializer):
             newpassword = None
         if newpassword:
             instance.set_password(newpassword)
-        # validated_data = self.update_sysaccount(validated_data)
+        validated_data = self.update_sysaccount(validated_data)
         return super(UserSerializer, self).update(instance, validated_data)
 
 
