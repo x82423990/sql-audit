@@ -46,6 +46,11 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
         return self.filter_date(query_set)
 
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except Exception as e:
+            raise ParseError(e)
     def check_and_set_approve_status(self, instance, status_code):
         user = self.request.user
         try:
