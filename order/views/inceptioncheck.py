@@ -91,6 +91,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             userlist.append(developer_supremo.id)
             print("userlist", userlist)
             return userlist
+        return userlist
 
     # 重写create 方法
     def create(self, request, *args, **kwargs):
@@ -147,6 +148,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 判断是否需要副总审核
         work_step_list = self.get_step_user(instance, approve_user_list, rows)
         # 筛选审批流程人
+        print('work_step_list', work_step_list)
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
         self.mail(instance, self.action_type_check)
         self.ret['data'] = {"id": instance.id}
