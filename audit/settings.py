@@ -39,6 +39,7 @@ djcelery.setup_loader()
 BROKER_URL = 'redis://127.0.0.1:6379/0'  # redis broker
 CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # redis backend
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Los_Angeles'
 CELERY_ENABLE_UTC = True

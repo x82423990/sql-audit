@@ -107,7 +107,6 @@ class ActionMxins(AppellationMixins, object):
                 User.objects.filter(role="developer_supremo")[0]
             # commiter = sqlobj.commiter
             db_name = sqlobj.db.name
-            print(db_name)
             mailto_users = [treater]
             # mailto_users = list(set(mailto_users))
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
