@@ -3,11 +3,13 @@ from celery import task
 import smtplib
 from email.mime.text import MIMEText
 
-mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
-mail_user = "zabbix@9ffenqigo.com"  # 用户名
-mail_pass = "bycx.40450"  # 密码
+# mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
+# mail_user = "zabbix@9ffenqigo.com"  # 用户名
+# mail_pass = "bycx.40450"  # 密码
 mail_postfix = "猴嘴测试"  # 发件箱的后缀
-
+mail_host = "smtp.163.com"
+mail_user = "eatted@163.com"
+mail_pass = "xl50140872"
 
 @task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, max_rows):  # to_list：收件人；sub：主题；content：邮件内容
@@ -47,7 +49,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
     msg['To'] = ";".join(to_list)
     try:
         print("start connect")
-        s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
+        s = smtplib.SMTP_SSL(host=mail_host, port=994, timeout=1)
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
         print('to_list', to_list)
