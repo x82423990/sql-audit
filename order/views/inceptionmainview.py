@@ -73,7 +73,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 判断是否有上级
             if nexsetp:
                 instance.up = True
-                self.mail(instance, nexsetp.email, self.action_type_check)
+                self.mail(instance, 'xieyifan07@sina.com', self.action_type_check)
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
