@@ -13,6 +13,7 @@ mail_postfix = "猴嘴测试"  # 发件箱的后缀
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
     contenthtml = ''
     sqlhtml = ''
+    print("task在执行")
     if action_type == '--enable-check':
         subject = "工单审核提醒"
         title = '提交了工单 SQL-{}'.format(sqlid)
