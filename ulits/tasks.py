@@ -15,11 +15,13 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
     sqlhtml = ''
     print("task在执行")
     subject = ""
+    print("to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,  max_rows", to_list, personnel, sqlid,
+          note, action_type, sqlcontent, dbname,
+          max_rows)
     if action_type == '--enable-check':
         print("--enable-check")
         subject = "工单审核提醒"
         title = '提交了工单 SQL-{}'.format(sqlid)
-        sqlhtml = ''
         for s in sqlcontent[0:1024].split(';'):
             if s:
                 sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
