@@ -46,6 +46,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
         s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
+        print('to_list', to_list)
         s.sendmail(me, to_list, msg.as_string())  # 发送邮件
         s.close()
         return True
