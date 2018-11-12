@@ -38,7 +38,7 @@ ALLOWED_HOSTS = ['*']
 djcelery.setup_loader()
 # 数据库调度
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
-BROKER_URL = 'amqp://sql:sql@127.0.0.1:5672/sql/'
+BROKER_URL = 'amqp://audit:audit@127.0.0.1:5672/sql/'
 
 # djcelery
 # platforms.C_FORCE_ROOT = True
