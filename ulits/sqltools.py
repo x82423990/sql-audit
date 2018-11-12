@@ -29,6 +29,7 @@ class Inception(object):
         sql = '/* {} */\
           inception_magic_start;\
           use {}; {} inception_magic_commit;'.format(dbaddr, self.dbname, self.sql)
+        print(sql)
         try:
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception
@@ -40,6 +41,7 @@ class Inception(object):
             result = cur.fetchall()
             conn.close()
         except pymysql.Error as e:
+            print("我链接失败了")
             status = -1
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
         return {'result': result, 'status': status}

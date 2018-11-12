@@ -145,12 +145,16 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         serializer = self.serializer_class(data=request_data)
         serializer.is_valid(raise_exception=True)
         # 保存model
-        instance = serializer.save()
-        # 判断是否需要副总审核
-        work_step_list = self.get_step_user(instance, approve_user_list, rows)
-        # 筛选审批流程人
-        print('work_step_list', work_step_list)
-        self.create_step(instance, request_data['workorder'], work_step_list[1:])
-        self.mail(instance, self.action_type_check, leader_obj.email, 1)
-        self.ret['data'] = {"id": instance.id}
-        return Response(self.ret, status=status.HTTP_201_CREATED)
+        try:
+            instance = serializer.save()
+            # 判断是否需要副总审核
+            work_step_list = self.get_step_user(instance, approve_user_list, rows)
+            # 筛选审批流程人
+            print('work_step_list', work_step_list)
+            self.create_step(instance, request_data['workorder'], work_step_list[1:])
+            print("leader_obj.email", leader_obj.email)
+            self.mail(instance, leader_obj.email, self.action_type_check, 1)
+            self.ret['data'] = {"id": instance.id}
+            return Response(self.ret, status=status.HTTP_201_CREATED)
+        except Exception:
+            raise ParseError("未知错误!")
