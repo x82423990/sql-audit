@@ -27,7 +27,7 @@ LOGOUT_URL = 'rest_framework:logout'
 SECRET_KEY = 'f5_h2k)p(4wd#$=3n+#r$@ppsjr)i*_kgkal3o5gv5=0+g7$vm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 
