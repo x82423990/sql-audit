@@ -108,6 +108,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             rows = self.max_effect_rows(db_id, sql_content)
         except Exception:
             raise ParseError("链接错误", self.connect_error)
+        print("rows", rows)
         if rows == 0:
             raise ParseError(self.row_is_non)
         user_group_id = self.check_user_group(request)
