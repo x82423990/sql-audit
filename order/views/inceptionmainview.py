@@ -73,11 +73,11 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 判断是否有上级
             if nexsetp:
                 instance.up = True
-                self.mail(instance, 'xieyifan07@sina.com', self.action_type_check, max_rows)
+                # self.mail(instance, 'xieyifan07@sina.com', self.action_type_check, max_rows)
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
-                self.mail(instance, instance.commiter_email, action_type)
+                # self.mail(instance, instance.commiter_email, action_type)
             # 改变自己步骤的状态
             stepobj.status = status_code
         # 拒绝工单
@@ -88,7 +88,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 nexsetp.save()
             stepobj.status = status_code
             instance.workorder.status = status_code
-            self.mail(instance, instance.commiter_email, action_type)
+            # self.mail(instance, instance.commiter_email, action_type)
 
         instance.workorder.save()
         stepobj.save()
