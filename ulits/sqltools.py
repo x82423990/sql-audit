@@ -29,7 +29,7 @@ class Inception(object):
         sql = '/* {} */\
           inception_magic_start;\
           use {}; {} inception_magic_commit;'.format(dbaddr, self.dbname, self.sql)
-        print(sql)
+        (sql)
         try:
             conn = pymysql.connect(host=self.inception_ipaddr, user='', passwd='', port=6669, db='', use_unicode=True,
                                    charset="utf8")  # 连接inception
@@ -37,11 +37,11 @@ class Inception(object):
             try:
                 cur.execute(sql)
             except ProgrammingError as e:
-                print(e)
+                (e)
             result = cur.fetchall()
             conn.close()
         except pymysql.Error as e:
-            print("我链接失败了")
+            ("我链接失败了")
             status = -1
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
         return {'result': result, 'status': status}
@@ -64,7 +64,7 @@ class Inception(object):
                 cur.execute("desc %s;" % i)
             except (OperationalError, ProgrammingError) as e:
                 raise ParseError(e)
-            # print("cur.fetchone()", cur.fetchall())
+            # ("cur.fetchone()", cur.fetchall())
             table_name = cur.fetchone()[2]
             newsql = "show table status where name='%s';" % table_name
             cur = conn.cursor()
@@ -123,7 +123,7 @@ class SqlQuery(object):
         try:
             cur.execute(sql)
         except ProgrammingError as e:
-            print(e)
+            (e)
             return None
         return cur.fetchall()
 

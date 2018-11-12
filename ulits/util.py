@@ -146,15 +146,15 @@
 #                                    check_names=True, lazy=False, raise_exceptions=False)
 #                 conn2.bind()
 #                 if conn2.result["description"] == "success":
-#                     print((True, attr_dict["mail"], attr_dict["cn"], attr_dict["uid"]))
+#                     ((True, attr_dict["mail"], attr_dict["cn"], attr_dict["uid"]))
 #                     c.unbind()
 #                     conn2.unbind()
 #                     return True
 #                 else:
-#                     print("auth fail")
+#                     ("auth fail")
 #                     return False
 #             except Exception as e:
-#                 print("auth fail")
+#                 ("auth fail")
 #                 return False
 #         else:
 #             return False

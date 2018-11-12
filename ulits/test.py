@@ -19,18 +19,18 @@ def conn(sql):
         ##
         conn.close()
         num_fields = len(cur.description)
-        print("cur.description", cur.description)
-        print(result)
+        ("cur.description", cur.description)
+        (result)
         field_names = [i[0] for i in cur.description]
-        print(field_names)
+        (field_names)
         for row in result:
-            print(row[0], "|", row[1], "|", row[2], "|", row[3], "|", row[4], "|",
+            (row[0], "|", row[1], "|", row[2], "|", row[3], "|", row[4], "|",
                   row[5], "|", row[6], "|", row[7], "|", row[8], "|", row[9], "|", row[10])
         cur.close()
         conn.close()
     except MySQLdb.Error as e:
-        # print("Mysql Error %d: %s" % (e.args[0], e.args[1]))
-        print(e)
+        # ("Mysql Error %d: %s" % (e.args[0], e.args[1]))
+        (e)
 
 
 sqa = '/*--user=root;--password=yearning;--host=47.98.255.80;--port=3306;--enable-check;*/\
@@ -47,20 +47,20 @@ def affect(sql):
     # table_name = sql.split(" ")[1]
     # # 判断数据库执行引擎
     # engine = "show table status where name='%s';" % table_name
-    # print(newsql)
+    # (newsql)
     cur = conn.cursor()
     cur.execute("desc %s" % sql)
     table_name = cur.fetchone()[2]
     engine_sql = "show table status where name='%s';" % table_name
     cur.execute(engine_sql)
     engine = cur.fetchone()[1]
-    print(engine)
+    (engine)
     if engine == "InnoDB":
         line = cur.execute(sql)
     else:
         raise Exception("非InnoDB的表不适用！")
     conn.close()
-    print(line)
+    (line)
 
 
 class SqlQuery(object):
@@ -140,7 +140,7 @@ if __name__ == '__main__':
         a = [1, 2]
         b = random.sample(a, 1)[0]
         money = random.randint(100, 100000)
-        print(name, b, money)
+        (name, b, money)
         sqls = 'INSERT INTO info(username,sex,money) VALUES("%s",%d,%d)' % (name, b, money)
         # cur = conn.cursor()
         ret = cur.execute(sqls)

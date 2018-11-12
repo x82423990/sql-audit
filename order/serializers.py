@@ -16,7 +16,7 @@ class InceptionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_step_user_group(self, user_instance):
-        print("用户", user_instance)
+        ("用户", user_instance)
         group_name = user_instance.groups.first().name if user_instance and not user_instance.is_superuser else self.admin
         return group_name
 
@@ -50,7 +50,7 @@ class InceptionSerializer(serializers.ModelSerializer):
         ret['work_order_status'] = instance.workorder.status
 
         utc = instance.createtime.astimezone(timezone(timedelta(hours=8)))
-        # print(instance.users.first().email)
+        # (instance.users.first().email)
         ret['createtime'] = utc
         return ret
 

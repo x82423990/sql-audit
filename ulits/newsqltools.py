@@ -23,10 +23,10 @@ class Inception(object):
                                        port=6669,
                                        db='',
                                        charset="utf8")
-            print(self)
+            (self)
             return self
         except pymysql.Error as e:
-            print(e)
+            (e)
 
     def GenerateStatements(self, sql: str = '', types: str = '', backup=None):
         if sql[-1] == ';':
@@ -48,7 +48,7 @@ class Inception(object):
                    backup,
                    self.__dict__.get('db'),
                    sql)
-            print("------", InceptionSQL)
+            ("------", InceptionSQL)
             return InceptionSQL
         else:
             InceptionSQL = '''
@@ -64,7 +64,7 @@ class Inception(object):
                               types,
                               self.__dict__.get('db'),
                               sql)
-            print("------", InceptionSQL)
+            ("------", InceptionSQL)
             return InceptionSQL
 
     def Execute(self, sql, backup: int):
@@ -98,7 +98,7 @@ class Inception(object):
 
     def Check(self, sql=None):
         Inceptionsql = self.GenerateStatements(sql=sql, types='--enable-check')
-        print("out--", Inceptionsql)
+        ("out--", Inceptionsql)
         con = pymysql.connect(host=self.host,
                               user=self.user,
                               passwd=self.passwd,
@@ -156,6 +156,6 @@ if __name__ == '__main__':
     sql1 = 'UPDATE core_account SET email="teccccst@qq.com" WHERE username="liziyang";\nUPDATE core_account SET email="xddddieyifan@qq.com" WHERE username="test";;\n'
     sql = "UPDATE core_account SET email='teccccst@qq.com' WHERE username='liziyang';"
     # sql = str(sql).strip('\n').strip().rstrip(';')
-    print(sql)
+    (sql)
     In = Inception(info)
-    print(In.Check(sql))
+    (In.Check(sql))

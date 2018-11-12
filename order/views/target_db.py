@@ -37,6 +37,6 @@ class DbViewSet(ActionMxins, BaseView):
     @action(detail=True)
     def connect(self, request, *args, **kwargs):
         instance = self.get_object()
-        print(instance.id)
+        (instance.id)
         self.test_connect(instance.id)
         return Response(self.ret)

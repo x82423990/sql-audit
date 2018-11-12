@@ -40,17 +40,17 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         if request.data.get('env') == self.env_prd and not request.user.is_superuser:
             if not request.user.groups.exists():
                 raise ParseError(self.not_exists_group)
-            print(request.user.groups.first().id)
+            (request.user.groups.first().id)
             return request.user.groups.first().id
 
     # 工单步骤
     def create_step(self, instance, work_id, users_id):
         # 检查是否需要开启审核
-        print("检查是否需要开启审核")
-        print(self.is_manual_review and instance.env == self.env_prd)
+        ("检查是否需要开启审核")
+        (self.is_manual_review and instance.env == self.env_prd)
         if self.is_manual_review and instance.env == self.env_prd:
             # instance_id = instance.id
-            print("users_id", users_id)
+            ("users_id", users_id)
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
                 status = 0
@@ -90,7 +90,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             except IndexError:
                 raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
-            print("userlist", userlist)
+            ("userlist", userlist)
             return userlist
         return userlist
 
@@ -108,7 +108,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             rows = self.max_effect_rows(db_id, sql_content)
         except Exception:
             raise ParseError("链接错误", self.connect_error)
-        print("rows", rows)
+        ("rows", rows)
         if rows == 0:
             raise ParseError(self.row_is_non)
         user_group_id = self.check_user_group(request)

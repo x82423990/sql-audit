@@ -90,7 +90,6 @@ class PersonalCenterViewSet(PromptMxins, NewBaseView):
 
     def create(self, request, *args, **kwargs):
         request_data = request.data
-        print(request_data)
         new_pass = self.check_password(request_data)
         instance = request.user
         # instance.email = request_data.get("email")
@@ -107,5 +106,4 @@ class PersonalCenterViewSet(PromptMxins, NewBaseView):
         except Exception as e:
             raise ParseError(e)
         instance.save()
-        print(instance.email, instance.username)
         return Response(self.ret)

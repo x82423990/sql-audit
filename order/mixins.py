@@ -101,7 +101,7 @@ class ActionMxins(AppellationMixins, object):
 
     def mail(self, sqlobj, mailto, mailtype, max_rows=None):
         if sqlobj.env == self.env_prd:
-            print("--他和在执行")
+            ("--他和在执行")
             user_obj = self.request.user
             if user_obj.role == 'developer_manager':
                 mailto = User.objects.filter(role='developer_supremo')[0].email
@@ -110,6 +110,6 @@ class ActionMxins(AppellationMixins, object):
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
             mail_list = []
             mail_list.append(mailto)
-            print(mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content)
+            (mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content)
             send_mail.delay(mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
                             sqlobj.db.name, max_rows)

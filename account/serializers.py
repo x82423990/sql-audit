@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     # # 方法写法：get_ + 字段
     # def days_cccc(self, obj):
     #     # obj指这个model的对象
-    #     print(obj.username)
+    #     (obj.username)
     #     return obj.username
 
     class Meta:
@@ -32,8 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         # 这里框架默认是接受OrderDict参数的方法
-        # print("password", instance)
-        # print(type(instance))
+        # ("password", instance)
+        # (type(instance))
         ret = super(UserSerializer, self).to_representation(instance)
         if not isinstance(instance, OrderedDict):
             groupobj = instance.groups.first()
@@ -69,7 +69,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     # 重写update 方法，
     def update(self, instance, validated_data):
-        print("我重写update方法")
         validated_data.pop('password')
         try:
             newpassword = validated_data.pop('newpassword')

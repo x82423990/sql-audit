@@ -37,7 +37,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
     def get_queryset(self):
         userobj = self.request.user
-        print(userobj, userobj.role)
+        (userobj, userobj.role)
         # 如果是管理员显示全部工单
         if userobj.is_superuser:
             return self.filter_date(Inceptsql.objects.all())
@@ -146,7 +146,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
                                                                                  instance.sql_content,
                                                                                  self.action_type_execute)
-            print("success_sqls", success_sqls)
+            ("success_sqls", success_sqls)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
@@ -168,7 +168,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         # self.mail(instance, self.action_type_execute)
         # self.replace_remark(instance)
         instance.save()
-        print(instance.id)
+        (instance.id)
         return Response(self.ret)
 
     # @detail_route()

@@ -29,9 +29,9 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
         is_manual_review = obj.is_manual_review
         role = self.admin if user.is_superuser else user.role
         uri_list = request.META['PATH_INFO'].split('/')
-        print(uri_list)
+        (uri_list)
         uri = uri_list[-2]
-        print("URI", uri)
+        ("URI", uri)
         if (
                 request.method in SAFE_METHODS and uri not in reject_perms + approve_perms + handle_perms) or env == self.env_test:
             return True
@@ -57,11 +57,11 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
     @staticmethod
     def check_perm(env, is_manual_review, role, uri):
         try:
-            print(env, role)
+            (env, role)
             perm_obj = AuthRules.objects.get(env=env, is_manual_review=is_manual_review, role=role)
             # 如果是json 则需要些data=
             perm_serializer = AuthRulesSerializer(perm_obj)
             return perm_serializer.data.get(uri)
         except Exception as e:
-            print(e)
+            (e)
             return False
