@@ -99,23 +99,21 @@ class ActionMxins(AppellationMixins, object):
         except Exception as e:
             raise ParseError("host %s connected timeout" % dbobj.host)
 
-    def mail(self, sqlobj, mailtype, typ):
+    def mail(self, sqlobj, mailtype, max_rows):
         if sqlobj.env == self.env_prd:
-            if typ == 1:
-                print("--他和在执行")
-                username = self.request.user.username
-                treater = sqlobj.treater if username != sqlobj.treater else \
-                User.objects.filter(role="developer_supremo")[0]
-                # commiter = sqlobj.commiter
-                db_name = sqlobj.db.name
-                print(db_name)
-                mailto_users = [treater]
-                mailto_users = list(set(mailto_users))
-                mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
-                print(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content)
-                send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
-                                sqlobj.db.name)
-            elif typ == 2:
-                pass
+            print("--他和在执行")
+            username = self.request.user.username
+            treater = sqlobj.treater if username != sqlobj.treater else \
+            User.objects.filter(role="developer_supremo")[0]
+            # commiter = sqlobj.commiter
+            db_name = sqlobj.db.name
+            print(db_name)
+            mailto_users = [treater]
+            mailto_users = list(set(mailto_users))
+            mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
+            print(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content)
+            send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
+                            sqlobj.db.name, max_rows)
+
 
 

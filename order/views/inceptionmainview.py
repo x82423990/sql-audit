@@ -101,7 +101,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             #  call_type 1 为审批, status 为审批状态, 1 为allow， 2 reject
             if call_type == 1:
                 self.check_and_set_approve_status(instance, status)
-
+            action_type = 'approve' if status == 1 else 'reject'
+            self.mail(instance, action_type, None)
             # step_instance = instance.workorder.step_set.order_by('id')[step_number]
             # step_instance.status = status
             # step_instance.save()

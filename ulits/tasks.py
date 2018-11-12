@@ -10,7 +10,7 @@ mail_postfix = "猴嘴测试"  # 发件箱的后缀
 
 
 @task
-def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
+def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, max_rows):  # to_list：收件人；sub：主题；content：邮件内容
     contenthtml = ''
     sqlhtml = ''
     print("task在执行")
@@ -23,11 +23,13 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):
                 sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
         contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
-                      " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句： </p>".format(
-            personnel, title, note, dbname)
+                      " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句：{}行;" \
+                      "</p><p>SQL语句： </p>" \
+                      .format(
+            personnel, title, note, dbname, max_rows)
         if len(sqlcontent) > 1024:
             sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
-    elif action_type == 'execute':
+    elif action_type == 'approve':
         subject = "工单执行提醒"
         title = '你的工单{}已经审批通过.'.format(sqlid)
         contenthtml += title
