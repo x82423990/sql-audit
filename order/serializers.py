@@ -43,16 +43,14 @@ class InceptionSerializer(serializers.ModelSerializer):
     # 返回样式
     def to_representation(self, instance):
         ret = super(InceptionSerializer, self).to_representation(instance)
+        ret['commiter_email'] = User.objects.get(username=instance.commiter).email if User.objects.get(
+            username=instance.commiter) else None
         ret['db_name'] = instance.db.name
         ret['steps'] = self.get_step(instance)
         ret['work_order_status'] = instance.workorder.status
-        # ret['commiter_email'] = instance.users.email
-        print("instance.users.email", instance.users)
+
         utc = instance.createtime.astimezone(timezone(timedelta(hours=8)))
 
-        # UTC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-        # utcTime = datetime.datetime.strptime(utc, UTC_FORMAT)
-        # localtime = utcTime + timedelta(hours=8)
         ret['createtime'] = utc
         return ret
 
