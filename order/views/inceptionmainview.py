@@ -50,7 +50,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
         return self.filter_date(query_set)
 
-    def check_and_set_approve_status(self, instance, status_code, max_rows=None):
+    def check_and_set_approve_status(self, instance, status_code):
         action_type = 'approve' if status_code == 1 else 'reject'
         user = self.request.user
         try:
@@ -73,11 +73,14 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 判断是否有上级
             if nexsetp:
                 instance.up = True
-                # self.mail(instance, 'xieyifan07@sina.com', self.action_type_check, max_rows)
+                self.mail(instance, 'xieyifan07@sina.com', self.action_type_check, instance.exe_affected_rows)
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
-                # self.mail(instance, instance.commiter_email, action_type)
+                #
+                #
+                #
+                self.mail(instance, instance.commiter_email, action_type, instance.exe_affected_rows)
             # 改变自己步骤的状态
             stepobj.status = status_code
         # 拒绝工单
@@ -88,7 +91,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 nexsetp.save()
             stepobj.status = status_code
             instance.workorder.status = status_code
-            # self.mail(instance, instance.commiter_email, action_type)
+            self.mail(instance, instance.commiter_email, action_type, instance.exe_affected_rows)
 
         instance.workorder.save()
         stepobj.save()
