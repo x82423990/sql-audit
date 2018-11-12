@@ -99,7 +99,7 @@ class ActionMxins(AppellationMixins, object):
         except Exception as e:
             raise ParseError("host %s connected timeout" % dbobj.host)
 
-    def mail(self, sqlobj, mailto, mailtype, max_rows):
+    def mail(self, sqlobj, mailto, mailtype, max_rows=None):
         if sqlobj.env == self.env_prd:
             print("--他和在执行")
             username = self.request.user.username
