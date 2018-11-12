@@ -15,6 +15,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
     sqlhtml = ''
     print("task在执行")
     if action_type == '--enable-check':
+        print("--enable-check")
         subject = "工单审核提醒"
         title = '提交了工单 SQL-{}'.format(sqlid)
         sqlhtml = ''
@@ -30,6 +31,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
         if len(sqlcontent) > 1024:
             sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
     elif action_type == 'approve':
+        to_list
         subject = "工单执行提醒"
         title = '你的工单{}已经审批通过.'.format(sqlid)
         contenthtml += title
