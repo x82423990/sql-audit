@@ -7,7 +7,6 @@ from django.contrib.auth.models import Group
 from ulits.basemodel import BaseModel
 from workflow.models import WorkOrder
 
-
 # Create your models here.
 
 class Dbconf(BaseModel):
@@ -34,6 +33,7 @@ class Inceptsql(BaseModel):
         (0, u'执行成功'),
         (1, u'已放弃'),
         (2, u'执行失败'),
+        (3, u'执行成功，但回滚时效超过。')
     )
     ENVS = (
         ('prd', u'生产环境'),

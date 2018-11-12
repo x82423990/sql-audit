@@ -12,7 +12,7 @@ from order.permission import IsHandleAble
 from order.serializers import *
 from order.models import *
 from django.db.models import Q
-from pymysql import err
+from ..tasks import change_oder_status
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import (
     IsAdminUser,
@@ -37,7 +37,6 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
 
     def get_queryset(self):
         userobj = self.request.user
-        (userobj, userobj.role)
         # 如果是管理员显示全部工单
         if userobj.is_superuser:
             return self.filter_date(Inceptsql.objects.all())
@@ -146,7 +145,6 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
                                                                                  instance.sql_content,
                                                                                  self.action_type_execute)
-            ("success_sqls", success_sqls)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
@@ -164,11 +162,12 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             self.ret['data']['execute_time'] = '%.3f' % execute_time
         instance.exe_affected_rows = affected_rows
         self.ret['data']['affected_rows'] = affected_rows
+        # 延时改变工单状态
+        change_oder_status.delay(instance.id)
         # 邮件通知
         # self.mail(instance, self.action_type_execute)
         # self.replace_remark(instance)
         instance.save()
-        (instance.id)
         return Response(self.ret)
 
     # @detail_route()

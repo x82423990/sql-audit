@@ -3,6 +3,7 @@ from celery import task
 import smtplib
 from email.mime.text import MIMEText
 from celery import shared_task
+
 # mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
 # mail_user = "zabbix@9ffenqigo.com"  # 用户名
 # mail_pass = "bycx.40450"  # 密码
@@ -17,13 +18,9 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
               max_rows):  # to_list：收件人；sub：主题；content：邮件内容
     contenthtml = ''
     sqlhtml = ''
-    ("task在执行")
     subject = ""
-    ("to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,  max_rows", to_list, personnel, sqlid,
-          note, action_type, sqlcontent, dbname,
-          max_rows)
+
     if action_type == '--enable-check':
-        ("--enable-check")
         subject = "工单审核提醒"
         title = '提交了工单 SQL-{}， 需要您的审核。'.format(sqlid)
         for s in sqlcontent[0:1024].split(';'):
@@ -54,14 +51,11 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
     msg['From'] = me
     msg['To'] = ";".join(to_list)
     try:
-        ("start connect")
         s = smtplib.SMTP_SSL(host=mail_host, port=994, timeout=1)
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
-        ('to_list', to_list)
         s.sendmail(me, to_list, msg.as_string())  # 发送邮件
         s.close()
         return True
     except Exception as e:
-        (e)
         return False
