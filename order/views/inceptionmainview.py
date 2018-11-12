@@ -73,12 +73,11 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 判断是否有上级
             if nexsetp:
                 instance.up = True
-                self.mail(instance, 'xieyifan07@sina.com', self.action_type_check, instance.exe_affected_rows)
+                mailto = User.objects.filter(role='developer_supremo')[0].email
+                self.mail(instance, mailto, self.action_type_check, instance.exe_affected_rows)
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
-                #
-                #
                 #
                 self.mail(instance, instance.users.first().email, action_type, instance.exe_affected_rows)
             # 改变自己步骤的状态

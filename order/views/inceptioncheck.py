@@ -153,9 +153,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             # 判断是否需要副总审核
             work_step_list = self.get_step_user(instance, approve_user_list, rows)
             # 筛选审批流程人
-            print('work_step_list', work_step_list)
             self.create_step(instance, request_data['workorder'], work_step_list[1:])
-            print("leader_obj.email", leader_obj.email)
             self.mail(instance, leader_obj.email, self.action_type_check, 1)
             self.ret['data'] = {"id": instance.id}
             return Response(self.ret, status=status.HTTP_201_CREATED)

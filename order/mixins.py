@@ -102,10 +102,11 @@ class ActionMxins(AppellationMixins, object):
     def mail(self, sqlobj, mailto, mailtype, max_rows=None):
         if sqlobj.env == self.env_prd:
             print("--他和在执行")
-            username = self.request.user.username
-            treater = sqlobj.treater if username != sqlobj.treater else \
-                User.objects.filter(role="developer_supremo")[0]
-            # commiter = sqlobj.commiter
+            user_obj = self.request.user
+            if user_obj.role == 'developer_manager':
+                mailto = User.objects.filter(role='developer_supremo')[0].email
+            username = user_obj.username
+
             db_name = sqlobj.db.name
             mailto_users = [treater]
             # mailto_users = list(set(mailto_users))
