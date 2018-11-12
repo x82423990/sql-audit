@@ -80,8 +80,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
                 raise ParseError("当前实例中没有副总角色")
             instance.up = True
             instance.save()
-            userlist.append(developer_supremo.id)
             userlist.pop()
+            userlist.append(developer_supremo.id)
             return userlist
 
         if rows > 200:
