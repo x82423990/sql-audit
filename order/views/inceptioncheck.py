@@ -103,21 +103,20 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 检查数据库是否可达
         self.test_connect(db_id)
         sql_content = request_data.get('sql_content')
-        user_group_id = self.check_user_group(request)
-        try:
-            leader_obj = NewGroup.objects.get(pk=user_group_id).leader
-            print('--------------------------', leader_obj.username)
-        except Exception as e:
-            raise ParseError(self.not_group)
-        approve_user_list = [request.user.id, leader_obj.id]
-        print('approve_user_list', approve_user_list)
         # 去获取该次提交影响的行数
         try:
             rows = self.max_effect_rows(db_id, sql_content)
         except Exception:
             raise ParseError("链接错误", self.connect_error)
-        if rows <=0:
+        if rows == 0:
             raise ParseError(self.row_is_non)
+        user_group_id = self.check_user_group(request)
+        try:
+            leader_obj = NewGroup.objects.get(pk=user_group_id).leader
+        except Exception as e:
+            raise ParseError(self.not_group)
+        approve_user_list = [request.user.id, leader_obj.id]
+
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
