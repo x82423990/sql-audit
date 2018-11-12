@@ -51,6 +51,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         return self.filter_date(query_set)
 
     def check_and_set_approve_status(self, instance, status_code):
+        action_type = 'approve' if status_code == 1 else 'reject'
         user = self.request.user
         try:
             stepobj = instance.workorder.step_set.get(user_id=user.id)
@@ -72,9 +73,11 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             # 判断是否有上级
             if nexsetp:
                 instance.up = True
+                self.mail(instance, nexsetp.email, self.action_type_check)
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
+                self.mail(instance, instance.commiter.email, action_type)
             # 改变自己步骤的状态
             stepobj.status = status_code
         # 拒绝工单
@@ -85,6 +88,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 nexsetp.save()
             stepobj.status = status_code
             instance.workorder.status = status_code
+            self.mail(instance, instance.commiter.email, action_type)
 
         instance.workorder.save()
         stepobj.save()
@@ -101,8 +105,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             #  call_type 1 为审批, status 为审批状态, 1 为allow， 2 reject
             if call_type == 1:
                 self.check_and_set_approve_status(instance, status)
-            action_type = 'approve' if status == 1 else 'reject'
-            # self.mail(instance, instance.commiter.email, action_type)
+
             # step_instance = instance.workorder.step_set.order_by('id')[step_number]
             # step_instance.status = status
             # step_instance.save()

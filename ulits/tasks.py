@@ -11,8 +11,10 @@ mail_host = "smtp.163.com"
 mail_user = "eatted@163.com"
 mail_pass = "xl50140872"
 
+
 @task
-def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, max_rows):  # to_list：收件人；sub：主题；content：邮件内容
+def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
+              max_rows):  # to_list：收件人；sub：主题；content：邮件内容
     contenthtml = ''
     sqlhtml = ''
     print("task在执行")
@@ -23,21 +25,25 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname, 
     if action_type == '--enable-check':
         print("--enable-check")
         subject = "工单审核提醒"
-        title = '提交了工单 SQL-{}'.format(sqlid)
+        title = '提交了工单 SQL-{}， 需要您的审核。'.format(sqlid)
         for s in sqlcontent[0:1024].split(';'):
             if s:
                 sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
         contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
-                      " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句：{}行;" \
+                      " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句影响行数：{}行" \
                       "</p><p>SQL语句： </p>" \
-                      .format(
+            .format(
             personnel, title, note, dbname, max_rows)
         if len(sqlcontent) > 1024:
             sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
     elif action_type == 'approve':
         subject = "工单执行提醒"
         title = '你的工单{}已经审批通过.'.format(sqlid)
+        contenthtml += title
+    elif action_type == 'reject':
+        subject = "工单{}未通过提醒"
+        title = '您的工单{}未被通过.'.format(sqlid)
         contenthtml += title
 
     me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示

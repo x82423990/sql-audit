@@ -109,7 +109,7 @@ class ActionMxins(AppellationMixins, object):
             db_name = sqlobj.db.name
             print(db_name)
             mailto_users = [treater]
-            mailto_users = list(set(mailto_users))
+            # mailto_users = list(set(mailto_users))
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
             mail_list = []
             mail_list.append(mailto)
