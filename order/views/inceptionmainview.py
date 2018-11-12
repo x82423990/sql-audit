@@ -80,7 +80,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 #
                 #
                 #
-                self.mail(instance, instance.commiter_email, action_type, instance.exe_affected_rows)
+                self.mail(instance, instance.users.first().email, action_type, instance.exe_affected_rows)
             # 改变自己步骤的状态
             stepobj.status = status_code
         # 拒绝工单
@@ -91,7 +91,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 nexsetp.save()
             stepobj.status = status_code
             instance.workorder.status = status_code
-            self.mail(instance, instance.commiter_email, action_type, instance.exe_affected_rows)
+            self.mail(instance, instance.users.first().email, action_type, instance.exe_affected_rows)
 
         instance.workorder.save()
         stepobj.save()
