@@ -11,20 +11,21 @@ mail_postfix = "猴嘴测试"  # 发件箱的后缀
 
 @task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
-    print("我在执行！！,,,,,,,,,,,", [to_list, personnel, sqlid, note, action_type, sqlcontent, dbname])
     if action_type == '--enable-check':
-        title = '提交了 SQL-{}'.format(sqlid)
+        title = '提交了工单 SQL-{}'.format(sqlid)
     elif action_type == '--enable-execute':
         title = '已执行 SQL-{}'.format(sqlid)
+
     else:
         title = "Unknow title"
     sqlhtml = ''
     for s in sqlcontent[0:1024].split(';'):
         if s:
             sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
-    contenthtml = "<span style='margin-right:20px'>{} {}</span> <a href='http://sql.aaa.com/sql/{}'>【查看详情】</a>" \
+    contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
+                  "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
                   " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句： </p>".format(
-        personnel, title, sqlid, note, dbname)
+        personnel, title, note, dbname)
     if len(sqlcontent) > 1024:
         sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
     me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示

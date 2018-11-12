@@ -81,6 +81,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             instance.up = True
             instance.save()
             userlist.append(developer_supremo.id)
+            userlist.pop()
             return userlist
 
         if rows > 200:
@@ -150,6 +151,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 筛选审批流程人
         print('work_step_list', work_step_list)
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
-        self.mail(instance, self.action_type_check)
+        self.mail(instance, self.action_type_check, 1)
         self.ret['data'] = {"id": instance.id}
         return Response(self.ret, status=status.HTTP_201_CREATED)
