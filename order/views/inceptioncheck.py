@@ -136,6 +136,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         workorder_instance = workorder_serializer.save()
 
         # 封装数据
+        request_data['user'] = request.user
         request_data["exe_affected_rows"] = self.max_effect_rows(db_id, sql_content)
         request_data['group'] = user_group_id
         request_data['commiter'] = request.user.username
