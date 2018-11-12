@@ -115,7 +115,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         try:
             rows = self.max_effect_rows(db_id, sql_content)
         except Exception:
-            raise ParseError(self.connect_error)
+            raise ParseError("链接错误", self.connect_error)
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
         select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
