@@ -2,7 +2,7 @@
 from celery import task
 import smtplib
 from email.mime.text import MIMEText
-
+from celery import shared_task
 # mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
 # mail_user = "zabbix@9ffenqigo.com"  # 用户名
 # mail_pass = "bycx.40450"  # 密码
@@ -12,7 +12,7 @@ mail_user = "eatted@163.com"
 mail_pass = "xl50140872"
 
 
-@task
+@shared_task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
               max_rows):  # to_list：收件人；sub：主题；content：邮件内容
     contenthtml = ''
