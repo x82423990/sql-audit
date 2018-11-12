@@ -3,8 +3,10 @@ from rest_framework import serializers
 from ulits.dbcrypt import prpcrypt
 from ulits.basemixins import AppellationMixins
 from .models import *
+from account.models import User
 # import datetime
 from datetime import datetime, timedelta, timezone
+
 
 class InceptionSerializer(serializers.ModelSerializer):
     admin = 'Admin'
@@ -44,7 +46,8 @@ class InceptionSerializer(serializers.ModelSerializer):
         ret['db_name'] = instance.db.name
         ret['steps'] = self.get_step(instance)
         ret['work_order_status'] = instance.workorder.status
-        # ret[]
+        # ret['commiter_email'] = instance.users.email
+        print("instance.users.email", instance.users)
         utc = instance.createtime.astimezone(timezone(timedelta(hours=8)))
 
         # UTC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -104,7 +107,7 @@ class PersonalSerializer(AppellationMixins, serializers.ModelSerializer):
         return db_list
 
     def get_commiter(self, instance):
-        return {'id': instance.id, 'username': instance.username}
+        return {'id': instance.id, 'username': instance.username, 'mail': instance.email}
 
     def to_representation(self, instance):
         env = self.context['request'].GET.get('env')
