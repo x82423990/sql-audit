@@ -11,27 +11,31 @@ mail_postfix = "猴嘴测试"  # 发件箱的后缀
 
 @task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname):  # to_list：收件人；sub：主题；content：邮件内容
-    if action_type == '--enable-check':
-        title = '提交了工单 SQL-{}'.format(sqlid)
-    elif action_type == '--enable-execute':
-        title = '已执行 SQL-{}'.format(sqlid)
-
-    else:
-        title = "Unknow title"
+    contenthtml = ''
     sqlhtml = ''
-    for s in sqlcontent[0:1024].split(';'):
-        if s:
-            sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
-    contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
-                  "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
-                  " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句： </p>".format(
-        personnel, title, note, dbname)
-    if len(sqlcontent) > 1024:
-        sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
+    if action_type == '--enable-check':
+        subject = "工单审核提醒"
+        title = '提交了工单 SQL-{}'.format(sqlid)
+        sqlhtml = ''
+        for s in sqlcontent[0:1024].split(';'):
+            if s:
+                sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
+        contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
+                      "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
+                      " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句： </p>".format(
+            personnel, title, note, dbname)
+        if len(sqlcontent) > 1024:
+            sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
+    elif action_type == 'execute':
+        subject = "工单执行提醒"
+        title = '你的工单{}已经审批通过.'.format(sqlid)
+        contenthtml += title
+
     me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     # me = "<"'hulala'+'@'+'DbApprove.com'">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     msg = MIMEText(contenthtml + sqlhtml, _subtype='html', _charset='utf-8')  # 创建一个实例，这里设置为html格式邮件
-    msg['Subject'] = '{} {} [{}]'.format(personnel, title, note)  # 设置主题
+    # msg['Subject'] = '{} {} [{}]'.format(personnel, title, note)  # 设置主题
+    msg['Subject'] = '{}]'.format(subject)
     msg['From'] = me
     msg['To'] = ";".join(to_list)
     try:
