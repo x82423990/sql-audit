@@ -39,3 +39,4 @@ class PromptMxins(object):
     not_group = '你不能提交工单，因为你没有领导Txx'
     forbidden_select = "暂不支持Select语句"
     not_sucessed_order = "该工单没有执行，不能回滚"
+    row_is_non = "该条mysql语句无效，因为影响行数为0."
