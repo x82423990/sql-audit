@@ -29,7 +29,7 @@ LOGOUT_URL = 'rest_framework:logout'
 SECRET_KEY = 'f5_h2k)p(4wd#$=3n+#r$@ppsjr)i*_kgkal3o5gv5=0+g7$vm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = []
 
@@ -39,9 +39,10 @@ djcelery.setup_loader()
 # 数据库调度
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 BROKER_URL = 'amqp://root:root@127.0.0.1:5672/sql'
-
+# 允许ROOT 运行
+platforms.C_FORCE_ROOT = True
 # djcelery
-# platforms.C_FORCE_ROOT = True
+
 # djcelery.setup_loader()
 # BROKER_URL = 'redis://127.0.0.1:6379/0'  # redis broker
 # CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # redis backend
