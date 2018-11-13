@@ -104,7 +104,8 @@ class ActionMxins(AppellationMixins, object):
             user_obj = self.request.user
             if user_obj.role == 'developer_manager' and mailtype == self.action_type_check:
                 mailto = User.objects.filter(role='developer_supremo')[0].email
-            username = user_obj.username
+            # username = user_obj.username
+            username = sqlobj.commiter
             # mailto_users = list(set(mailto_users))
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
             mail_list = []

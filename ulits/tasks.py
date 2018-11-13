@@ -37,11 +37,13 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
     elif action_type == 'approve':
         subject = "工单执行提醒"
         title = '你的工单{}已经审批通过.'.format(sqlid)
-        contenthtml += title
+        contenthtml = "<span style='margin-right:20px'>{}</span> " \
+                      "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
     elif action_type == 'reject':
         subject = "工单{}未通过提醒"
         title = '您的工单{}未被通过.'.format(sqlid)
-        contenthtml += title
+        contenthtml = "<span style='margin-right:20px'>{}</span> " \
+                      "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
 
     me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     # me = "<"'hulala'+'@'+'DbApprove.com'">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
