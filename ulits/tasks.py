@@ -4,13 +4,13 @@ import smtplib
 from email.mime.text import MIMEText
 from celery import shared_task
 
-# mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
-# mail_user = "zabbix@9ffenqigo.com"  # 用户名
-# mail_pass = "bycx.40450"  # 密码
-mail_postfix = "猴嘴测试"  # 发件箱的后缀
-mail_host = "smtp.163.com"
-mail_user = "eatted@163.com"
-mail_pass = "xl50140872"
+mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
+mail_user = "zabbix@9ffenqigo.com"  # 用户名
+mail_pass = "bycx.40450"  # 密码
+mail_postfix = "SQL审计通知"  # 发件箱的后缀
+# mail_host = "smtp.163.com"
+# mail_user = "eatted@163.com"
+# mail_pass = "xl50140872"
 
 
 @shared_task
@@ -19,7 +19,6 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
     contenthtml = ''
     sqlhtml = ''
     subject = ""
-
     if action_type == '--enable-check':
         subject = "工单审核提醒"
         title = '提交了工单 SQL-{}， 需要您的审核。'.format(sqlid)
@@ -40,7 +39,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
         contenthtml = "<span style='margin-right:20px'>{}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
     elif action_type == 'reject':
-        subject = "工单{}未通过提醒"
+        subject = "工单未通过提醒"
         title = '您的工单{}未被通过.'.format(sqlid)
         contenthtml = "<span style='margin-right:20px'>{}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
