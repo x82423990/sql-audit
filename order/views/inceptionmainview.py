@@ -77,7 +77,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             else:
                 # 没有上级直接改变状态
                 instance.workorder.status = 1
-                #
+                print("我这里是邮箱 ", instance.users.first().email)
                 self.mail(instance, instance.users.first().email, action_type, instance.exe_affected_rows)
             # 改变自己步骤的状态
             stepobj.status = status_code
