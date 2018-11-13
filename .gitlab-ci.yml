@@ -1,0 +1,35 @@
+image: docker
+services:
+- name: docker:dind
+  alias: docker
+stages:
+  - compile
+  - build
+
+#   - deploy
+
+
+variables:
+  CI_JOB_USER: "xieyifan"
+  CI_JOB_TOKEN: "Aa123456"
+  DOCKER_DRIVER: overlay2
+  # 如果上面没有加 alias 别名这里就要添加
+  DOCKER_HOST: tcp://localhost:2375
+
+
+
+compile:
+  stage: compile
+  before_script:
+  - docker login -u $CI_JOB_USER -p $CI_JOB_TOKEN ${CI_REGISTRY}
+  script:
+  - cp Dockerfile ../
+  - cd ../
+  - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:5} .
+  - docker push  ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:5}
+  - echo "suceess"
+  only:
+  - master
+  tags:
+  - docker
+
