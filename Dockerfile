@@ -3,4 +3,4 @@ ADD DevOpsPlatForm /work
 WORKDIR /work/
 EXPOSE 8000
 # ENTRYPOINT ["bash", "manage.py", "runserver"]
-CMD ["bash", "-c", "starh.sh"]
+CMD ["bash", "-c", "start.sh"]
