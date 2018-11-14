@@ -97,7 +97,7 @@ class ActionMxins(AppellationMixins, object):
                                           port=int(dbobj.port), db=dbobj.name, test=True)
             return ret
         except Exception as e:
-            raise ParseError("host %s connected timeout" % dbobj.host)
+            raise ParseError("host %s %s" % dbobj.host, e)
 
     def mail(self, sqlobj, mailto, mailtype, max_rows=None):
         if sqlobj.env == self.env_prd:
