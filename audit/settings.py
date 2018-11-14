@@ -38,7 +38,7 @@ ALLOWED_HOSTS = ['*']
 djcelery.setup_loader()
 # 数据库调度
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
-BROKER_URL = 'amqp://root:root@120.79.128.26:5672/sql'
+BROKER_URL = 'amqp://root:root@172.16.130.207:5672/sql'
 # 允许ROOT 运行
 platforms.C_FORCE_ROOT = True
 # djcelery
@@ -116,10 +116,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'audit',
-        'USER': 'applist',
+        'USER': 'sqlaudit',
         'PASSWORD': 'Fs9006',
-        'HOST': '172.16.130.202',
-        'PORT': '3306',
+        'HOST': '172.16.130.207',
+        'PORT': '13306',
     },
 }
 

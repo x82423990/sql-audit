@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group
 from ulits.basemodel import BaseModel
 from workflow.models import WorkOrder
 
+
 # Create your models here.
 
 class Dbconf(BaseModel):
