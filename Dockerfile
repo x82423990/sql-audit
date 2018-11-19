@@ -1,4 +1,4 @@
-FROM registry.boyait.9fwealth.com:1443/devops/images/python:3.6-celery
+FROM registry.boyait.9fwealth.com:1443/devops/images/python:3.6-celery-pymysql
 ADD DevOpsPlatForm /work
 WORKDIR /work/
 EXPOSE 8000
