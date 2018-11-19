@@ -68,8 +68,8 @@ class ActionMxins(AppellationMixins, object):
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, action_type)
         try:
             sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
-        except Exception:
-            raise ParseError(self.inception_err)
+        except Exception as e:
+            raise ParseError(e)
         result, status = sql_review.get('result'), sql_review.get('status')
         if status == -1 or len(result) == 1:
             raise ParseError({self.connect_error: result})
