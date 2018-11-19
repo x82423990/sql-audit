@@ -40,20 +40,17 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         if request.data.get('env') == self.env_prd and not request.user.is_superuser:
             if not request.user.groups.exists():
                 raise ParseError(self.not_exists_group)
-            (request.user.groups.first().id)
             return request.user.groups.first().id
 
     # 工单步骤
     def create_step(self, instance, work_id, users_id):
         # 检查是否需要开启审核
-        ("检查是否需要开启审核")
-        (self.is_manual_review and instance.env == self.env_prd)
         if self.is_manual_review and instance.env == self.env_prd:
             # instance_id = instance.id
-            ("users_id", users_id)
             for index, uid in enumerate(users_id):
                 # status = 1 if index == 0 else 0
                 status = 0
+                print("我创建一个一个步骤")
                 # 保存step流程
                 step_serializer = self.serializer_step(data={'work_order': work_id, 'user': uid, 'status': status})
                 step_serializer.is_valid(raise_exception=True)
@@ -90,7 +87,6 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             except IndexError:
                 raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
-            ("userlist", userlist)
             return userlist
         return userlist
 
@@ -106,9 +102,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 去获取该次提交影响的行数
         try:
             rows = self.max_effect_rows(db_id, sql_content)
-        except Exception:
-            raise ParseError("链接错误", self.connect_error)
-        ("rows", rows)
+        except Exception as e:
+            raise ParseError(e, self.connect_error)
         if rows == 0:
             raise ParseError(self.row_is_non)
         user_group_id = self.check_user_group(request)
