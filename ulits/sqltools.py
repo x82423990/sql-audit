@@ -15,7 +15,7 @@ class Inception(object):
         self.sql = sql
         self.dbname = dbname
         # Inception 数据库地址，用户，密码，端口
-        self.inception_ipaddr = '172.17.69.232'
+        self.inception_ipaddr = '172.17.69.231'
         self.user = 'root'
         self.passwd = 'Fs9006'
         self.port = 3306
