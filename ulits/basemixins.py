@@ -40,3 +40,4 @@ class PromptMxins(object):
     forbidden_select = "暂不支持Select语句"
     not_sucessed_order = "该工单没有执行，不能回滚"
     row_is_non = "该条mysql语句无效，因为影响行数为0."
+    inception_err = 'Inception2 链接失败'

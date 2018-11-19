@@ -15,7 +15,7 @@ class Inception(object):
         self.sql = sql
         self.dbname = dbname
         # Inception 数据库地址，用户，密码，端口
-        self.inception_ipaddr = '172.17.69.231'
+        self.inception_ipaddr = '172.17.69.232'
         self.user = 'root'
         self.passwd = 'Fs9006'
         self.port = 3306
@@ -48,8 +48,7 @@ class Inception(object):
         # try:
         password = self.decrypt_password(pwd)
         conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port, connect_timeout=5)
-        # except (Exception, OperationalError) as e:
-        #     raise e
+
 
         # 测试连通性
         if test is not None:

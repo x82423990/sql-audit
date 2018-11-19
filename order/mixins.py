@@ -66,7 +66,10 @@ class ActionMxins(AppellationMixins, object):
     def check_execute_sql(self, db_id, sql_content, action_type):
         dbobj = Dbconf.objects.get(id=db_id)
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, action_type)
-        sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
+        try:
+            sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
+        except Exception:
+            raise ParseError(self.inception_err)
         result, status = sql_review.get('result'), sql_review.get('status')
         if status == -1 or len(result) == 1:
             raise ParseError({self.connect_error: result})
@@ -91,7 +94,10 @@ class ActionMxins(AppellationMixins, object):
 
     @staticmethod
     def test_connect(db_id):
-        dbobj = Dbconf.objects.get(id=db_id)
+        try:
+            dbobj = Dbconf.objects.get(id=db_id)
+        except Exception as e:
+            raise ParseError(e)
         try:
             ret = Inception().rows_effect(user=dbobj.user, pwd=dbobj.password, host=dbobj.host,
                                           port=int(dbobj.port), db=dbobj.name, test=True)

@@ -122,6 +122,16 @@ DATABASES = {
         'PORT': '13306',
     },
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'audit4',
+#         'USER': 'root',
+#         'PASSWORD': 'Fs9006',
+#         'HOST': '172.17.69.231',
+#         'PORT': '3306',
+#     },
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
