@@ -41,3 +41,5 @@ class PromptMxins(object):
     not_sucessed_order = "该工单没有执行，不能回滚"
     row_is_non = "该条mysql语句无效，因为影响行数为0."
     inception_err = 'Inception2 链接失败'
+    execute_sql_not_cancel = "该工单不能撤销."
+    step_is_approving = "正在审核的工单不能被撤销."

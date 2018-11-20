@@ -66,13 +66,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     # 判断是否大于200行
     def get_step_user(self, instance, userlist, rows):
 
-        # 获取SQL 语句的影响行数
-        # rows = 201
-        # userlist = list(set(userlist))
-        # 审核人是他自己
+        # 审核人是他自己就说明她是manger
         if userlist[0] == userlist[1]:
             try:
-                developer_supremo = User.objects.filter(role="developer_supremo")[0]
+                developer_supremo = User.objects.filter(role="developer_supremo")[1]
             except IndexError:
                 raise ParseError("当前实例中没有副总角色")
             instance.up = True
@@ -80,10 +77,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             userlist.pop()
             userlist.append(developer_supremo.id)
             return userlist
-
+        # 如果大于200行， 需要2个经理审核
         if rows > 200:
             try:
-                developer_supremo = User.objects.filter(role="developer_supremo")[0]
+                developer_supremo = User.objects.filter(role="developer_supremo")[1]
             except IndexError:
                 raise ParseError("当前实例中没有副总角色")
             userlist.append(developer_supremo.id)
@@ -145,8 +142,9 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 保存model
 
         instance = serializer.save()
-        # 判断是否需要副总审核
+        # 确定审核人员
         work_step_list = self.get_step_user(instance, approve_user_list, rows)
+        print("work_step_list", work_step_list)
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
         self.mail(instance, leader_obj.email, self.action_type_check, 1)

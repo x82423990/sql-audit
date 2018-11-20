@@ -29,6 +29,23 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
     permission_classes = [IsAuthenticated, IsHandleAble]
     search_fields = ['status']
 
+    def filter_types(self, queryset):
+        keyword = self.request.GET.get('types')
+        if keyword:
+            commiter = self.request.user.username
+
+            if keyword == "commit":
+                return queryset.filter(commiter=commiter)
+
+            if keyword == "approve":
+                return queryset.filter(~Q(commiter=commiter))
+        return queryset
+
+    # def filter_approve_status(self, queryset):
+    #     approve_status = self.request.GET.get('approve_status') or None
+    #     if approve_status is None:
+    #         return queryset
+
     def filter_date(self, queryset):
         date_range = self.request.GET.get('daterange')
         if date_range:
@@ -39,15 +56,15 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         userobj = self.request.user
         # 如果是管理员显示全部工单
         if userobj.is_superuser:
-            return self.filter_date(Inceptsql.objects.all())
+            return self.filter_types(Inceptsql.objects.all())
         if userobj.role == self.dev_spm:
-            return self.filter_date(Inceptsql.objects.filter(Q(status=0) | Q(up=True)))
+            return self.filter_types(Inceptsql.objects.filter(Q(status=0) | Q(up=True)))
         try:
             query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
         except AttributeError:
             query_set = userobj.inceptsql_set.all()
 
-        return self.filter_date(query_set)
+        return self.filter_types(query_set)
 
     def check_and_set_approve_status(self, instance, status_code):
         action_type = 'approve' if status_code == 1 else 'reject'
@@ -213,3 +230,19 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         instance.roll_affected_rows = self.ret['data']['affected_rows'] = len(execute_results) - 1
         self.replace_remark(instance)
         return Response(self.ret)
+
+    @action(detail=True)
+    def cancel(self, request, *args, **kwargs):
+        instance = self.get_object()
+        status_list = []
+        if instance.status == -1:
+            for i in instance.workorder.step_set.filter():
+                status_list.append(i.status)
+            if len(status_list) > 1:
+                if status_list[0] != status_list[1]:
+                    raise ParseError(self.step_is_approving)
+            instance.status = 1
+            instance.save()
+            return Response(self.ret)
+        else:
+            raise ParseError(self.execute_sql_not_cancel)

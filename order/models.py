@@ -1,9 +1,10 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
-from django.db import models
-from account.models import User
 from django.contrib.auth.models import Group
+from django.db import models
+
+from account.models import User
 from ulits.basemodel import BaseModel
 from workflow.models import WorkOrder
 
@@ -26,13 +27,17 @@ class Dbconf(BaseModel):
         unique_together = ('name', 'host', 'env')
 
 
+class BusinessSegments(BaseModel):
+    segments_name = models.CharField(max_length=64, null=True, blank=True)
+
+
 class Inceptsql(BaseModel):
     STATUS = (
         (-3, u'已回滚'),
         (-2, u'已暂停'),
         (-1, u'待执行'),
         (0, u'执行成功'),
-        (1, u'已放弃'),
+        (1, u'撤销'),
         (2, u'执行失败'),
         (3, u'执行成功，但回滚时效超过。')
     )
@@ -52,6 +57,7 @@ class Inceptsql(BaseModel):
     type = models.CharField(max_length=32, null=True, blank=True)
     up = models.BooleanField(default=False, verbose_name='副总审批')
     treater = models.CharField(max_length=32)
+    business_segments = models.ForeignKey(BusinessSegments, blank=True,null=True, on_delete=models.SET_NULL)
     status = models.IntegerField(default=-1, choices=STATUS)
     execute_errors = models.TextField(default='', null=True, blank=True)
     exe_affected_rows = models.CharField(max_length=10, null=True, blank=True)

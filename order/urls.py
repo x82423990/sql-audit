@@ -20,18 +20,15 @@ from rest_framework.routers import DefaultRouter
 from order.views.target_db import *
 from .views.inceptioncheck import *
 from .views.inceptionmainview import *
+from .views.segments import *
 
 router = DefaultRouter()
 # 如果没有viewset 没有指定queryset， 则需要指定base_name
 router.register(r'db', DbViewSet, base_name=DbViewSet)
 router.register(r'sql', InceptionCheckView)
 router.register(r'inceptions', InceptionMainView, base_name='InceptionMainView')
+router.register(r'segment', SegmentsViewSet)
 
-# router.register(r'groups', GroupViewSet)
-# router.register(r'users', NewInfo)
-# router.register(r'groups', DepartmentInfo)
 urlpatterns = [
-    # path('login/', LoginAuth.as_view()),
-    # url(r'users/(.*)', UserInfo.as_view()),
     url(r'^', include(router.urls)),
 ]
