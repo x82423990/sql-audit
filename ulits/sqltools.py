@@ -1,7 +1,6 @@
 # coding=utf-8
 import subprocess
 import pymysql
-import MySQLdb
 
 from rest_framework.exceptions import ParseError
 from .dbcrypt import prpcrypt
@@ -35,7 +34,7 @@ class Inception(object):
             cur = conn.cursor()
             try:
                 cur.execute(sql)
-            except ProgrammingError as e:
+            except pymysql.err.ProgrammingError as e:
                 raise e
             result = cur.fetchall()
             conn.close()
@@ -47,7 +46,7 @@ class Inception(object):
     def rows_effect(self, db, host, pwd, port, user, test=None):
         # try:
         password = self.decrypt_password(pwd)
-        conn = MySQLdb.connect(user=user, host=host, password=password, db=db, port=port, connect_timeout=5)
+        conn = pymysql.connect(user=user, host=host, password=password, db=db, port=port, connect_timeout=5)
 
 
         # 测试连通性

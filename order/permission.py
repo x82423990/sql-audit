@@ -29,9 +29,7 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
         is_manual_review = obj.is_manual_review
         role = self.admin if user.is_superuser else user.role
         uri_list = request.META['PATH_INFO'].split('/')
-        (uri_list)
         uri = uri_list[-2]
-        ("URI", uri)
         if (
                 request.method in SAFE_METHODS and uri not in reject_perms + approve_perms + handle_perms) or env == self.env_test:
             return True
@@ -41,12 +39,11 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
             if uri in handle_perms:
                 if not obj.workorder.status:
                     raise PermissionDenied(PromptMxins.require_handleable)
-                # if user.id not in approve_user_lists:
-                #     raise PermissionDenied(PromptMxins.require_different)
+
                 if obj.commiter != request.user.username:
                     raise PermissionDenied(PromptMxins.require_commiter)
             elif uri in approve_perms:
-                if user.id not in approve_user_lists:
+                if request.user.role != "developer_supremo" and user.id not in approve_user_lists:
                     raise PermissionDenied(PromptMxins.require_same)
         if uri in reject_perms:
             current_step = ActionMxins.get_current_step(obj)
@@ -57,11 +54,9 @@ class IsHandleAble(AppellationMixins, permissions.BasePermission):
     @staticmethod
     def check_perm(env, is_manual_review, role, uri):
         try:
-            (env, role)
             perm_obj = AuthRules.objects.get(env=env, is_manual_review=is_manual_review, role=role)
             # 如果是json 则需要些data=
             perm_serializer = AuthRulesSerializer(perm_obj)
             return perm_serializer.data.get(uri)
-        except Exception as e:
-            (e)
+        except Exception:
             return False

@@ -23,8 +23,12 @@ class InceptionSerializer(serializers.ModelSerializer):
         data = []
         # 获取工单步骤
         steps = instance.workorder.step_set.order_by('id')
+        super_user_list = [i.username for i in User.objects.filter(role="developer_supremo")]
+        # super_user_list = [5, 6]
+        commit_user = User.objects.get(username=instance.commiter)
+        step_num = 1 if commit_user.role == "developer_supremo" else 0
         for step in steps:
-            username = step.user.username if step.user else self.admin
+            username = [step.user.username] if step_num < 1 else super_user_list
             updatetime = step.updatetime if step.status != 0 else ''
             # group = self.get_step_user_group(step.user)
             data.append(
@@ -36,7 +40,8 @@ class InceptionSerializer(serializers.ModelSerializer):
                     'status': step.status
                 }
             )
-        data.insert(0, {'id': 0, 'updatetime': instance.createtime, 'username': '系统审核', 'status': 1})
+            step_num += 1
+        data.insert(0, {'id': 0, 'updatetime': instance.createtime, 'username': ['系统审核'], 'status': 1})
         return data
 
     # 返回样式

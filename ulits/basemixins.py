@@ -43,3 +43,4 @@ class PromptMxins(object):
     inception_err = 'Inception2 链接失败'
     execute_sql_not_cancel = "该工单不能撤销."
     step_is_approving = "正在审核的工单不能被撤销."
+    super = "developer_supremo"

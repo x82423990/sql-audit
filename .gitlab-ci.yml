@@ -8,7 +8,6 @@ stages:
 
 #   - deploy
 
-
 variables:
   CI_JOB_USER: "xieyifan"
   CI_JOB_TOKEN: "Aa123456"

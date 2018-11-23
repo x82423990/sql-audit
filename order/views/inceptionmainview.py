@@ -60,7 +60,8 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         if userobj.role == self.dev_spm:
             return self.filter_types(Inceptsql.objects.filter(Q(status=0) | Q(up=True)))
         try:
-            query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else userobj.inceptsql_set.all()
+            query_set = userobj.groups.first().inceptsql_set.all() if userobj.role == self.dev_mng else \
+                userobj.inceptsql_set.all()
         except AttributeError:
             query_set = userobj.inceptsql_set.all()
 
@@ -72,7 +73,12 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
         try:
             stepobj = instance.workorder.step_set.get(user_id=user.id)
         except ObjectDoesNotExist:
-            raise ParseError("你没有改工单的审批权限")
+            if self.request.user.role == "developer_supremo":
+                user_id_list = [i.id for i in User.objects.filter(role="developer_supremo")]
+                user_id_list.remove(self.request.user.id)
+                stepobj = instance.workorder.step_set.get(user_id=user_id_list[0])
+            else:
+                raise ParseError("你没有该工单的审批权限")
         # 求上级
         prestep = instance.workorder.step_set.filter(pk=stepobj.id - 1)[0] if instance.workorder.step_set.filter(
             pk=stepobj.id - 1) else None

@@ -11,6 +11,7 @@ import json
 
 class ActionMxins(AppellationMixins, object):
     type_select_tag = 'select'
+    ddl_tag = 'create'
     action_type_execute = '--enable-execute'
     action_type_check = '--enable-check'
 
@@ -66,10 +67,10 @@ class ActionMxins(AppellationMixins, object):
     def check_execute_sql(self, db_id, sql_content, action_type):
         dbobj = Dbconf.objects.get(id=db_id)
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, action_type)
-        try:
-            sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
-        except Exception as e:
-            raise ParseError(e)
+        # try:
+        sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
+        # except Exception as e:
+        #     raise ParseError(e)
         result, status = sql_review.get('result'), sql_review.get('status')
         if status == -1 or len(result) == 1:
             raise ParseError({self.connect_error: result})

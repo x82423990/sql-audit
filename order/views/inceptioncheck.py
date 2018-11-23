@@ -43,16 +43,14 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             return request.user.groups.first().id
 
     # 工单步骤
-    def create_step(self, instance, work_id, users_id):
+    def create_step(self, instance, work_id, user_list):
         # 检查是否需要开启审核
         if self.is_manual_review and instance.env == self.env_prd:
             # instance_id = instance.id
-            for index, uid in enumerate(users_id):
+            for index, uid in enumerate(user_list):
                 # status = 1 if index == 0 else 0
-                status = 0
-                print("我创建一个一个步骤")
                 # 保存step流程
-                step_serializer = self.serializer_step(data={'work_order': work_id, 'user': uid, 'status': status})
+                step_serializer = self.serializer_step(data={'work_order': work_id, 'user': uid, 'status': 0})
                 step_serializer.is_valid(raise_exception=True)
                 step_serializer.save()
 
@@ -76,6 +74,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             instance.save()
             userlist.pop()
             userlist.append(developer_supremo.id)
+            # userlist.append([i.id for i in developer_supremo])
             return userlist
         # 如果大于200行， 需要2个经理审核
         if rows > 200:
@@ -91,24 +90,37 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     def create(self, request, *args, **kwargs):
         # 处理 数据
         request_data = request.data
-
+        isSup = True if request.user.role==self.super else False
         db_id = request_data.get('db')
         # 检查数据库是否可达
         self.test_connect(db_id)
         sql_content = request_data.get('sql_content')
+        create_tag = re.search(self.ddl_tag, sql_content, re.IGNORECASE)
         # 去获取该次提交影响的行数
-        try:
-            rows = self.max_effect_rows(db_id, sql_content)
-        except Exception as e:
-            raise ParseError(e, self.connect_error)
-        if rows == 0:
+        if create_tag is None:
+            try:
+                rows = self.max_effect_rows(db_id, sql_content)
+            except Exception as e:
+                raise ParseError(e, self.connect_error)
+        else:
+            rows = 0
+        if rows == 0 and create_tag is None:
             raise ParseError(self.row_is_non)
-        user_group_id = self.check_user_group(request)
-        try:
-            leader_obj = NewGroup.objects.get(pk=user_group_id).leader
-        except Exception as e:
-            raise ParseError(self.not_group)
-        approve_user_list = [request.user.id, leader_obj.id]
+        if isSup is False:
+            user_group_id = self.check_user_group(request)
+            try:
+                leader_obj = NewGroup.objects.get(pk=user_group_id).leader
+            except Exception as e:
+                raise ParseError(self.not_group)
+            approve_user_list = [request.user.id, leader_obj.id]
+        else:
+            user_list = [i.id for i in User.objects.filter(role=self.super)]
+            approve_user_list = user_list
+            user_group_id = None
+            for i in user_list:
+                if self.request.user.id != i:
+                    user_id = i
+                    leader_obj = User.objects.get(id=user_id)
 
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
@@ -129,10 +141,10 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
 
         # 封装数据
         request_data['user'] = request.user
-        request_data["exe_affected_rows"] = self.max_effect_rows(db_id, sql_content)
+        request_data["exe_affected_rows"] = rows
         request_data['group'] = user_group_id
         request_data['commiter'] = request.user.username
-        request_data['treater'] = leader_obj.username
+        request_data['treater'] = leader_obj.username if leader_obj is not None else None
         request_data['users'] = approve_user_list
         request_data['is_manual_review'] = self.get_strategy_is_manual_review(request_data.get('env'))  # 流程
         request_data['handle_result'] = handle_result
@@ -143,8 +155,12 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
 
         instance = serializer.save()
         # 确定审核人员
-        work_step_list = self.get_step_user(instance, approve_user_list, rows)
-        print("work_step_list", work_step_list)
+        if isSup:
+            work_step_list = approve_user_list
+            instance.up = True
+            instance.save()
+        else:
+            work_step_list = self.get_step_user(instance, approve_user_list, rows)
         # 筛选审批流程人
         self.create_step(instance, request_data['workorder'], work_step_list[1:])
         self.mail(instance, leader_obj.email, self.action_type_check, 1)
