@@ -51,9 +51,8 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
     msg['To'] = ";".join(to_list)
     try:
         s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
-        # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
-        s.sendmail(me, to_list, msg.as_string())  # 发送邮件
+        s.sendmail(mail_user, to_list, msg.as_string())  # 发送邮件
         s.close()
         return True
     except Exception as e:
