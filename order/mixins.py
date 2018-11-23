@@ -115,8 +115,9 @@ class ActionMxins(AppellationMixins, object):
             username = sqlobj.commiter
             # mailto_users = list(set(mailto_users))
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
-            mailto = [mailto]
+            mailto_conv = [mailto]
             mail_list = []
-            mail_list.extend(mailto)
+            mail_list.extend(mailto_conv)
+            print(mail_list)
             send_mail.delay(mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
                             sqlobj.db.name, max_rows)

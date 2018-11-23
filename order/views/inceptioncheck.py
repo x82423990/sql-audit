@@ -90,7 +90,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
     def create(self, request, *args, **kwargs):
         # 处理 数据
         request_data = request.data
-        isSup = True if request.user.role==self.super else False
+        isSup = True if request.user.role == self.super else False
         db_id = request_data.get('db')
         # 检查数据库是否可达
         self.test_connect(db_id)
@@ -106,14 +106,8 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             rows = 0
         if rows == 0 and create_tag is None:
             raise ParseError(self.row_is_non)
-        if isSup is False:
-            user_group_id = self.check_user_group(request)
-            try:
-                leader_obj = NewGroup.objects.get(pk=user_group_id).leader
-            except Exception as e:
-                raise ParseError(self.not_group)
-            approve_user_list = [request.user.id, leader_obj.id]
-        else:
+        if isSup:
+
             user_list = [i.id for i in User.objects.filter(role=self.super)]
             approve_user_list = user_list
             user_group_id = None
@@ -121,6 +115,13 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
                 if self.request.user.id != i:
                     user_id = i
                     leader_obj = User.objects.get(id=user_id)
+        else:
+            user_group_id = self.check_user_group(request)
+            try:
+                leader_obj = NewGroup.objects.get(pk=user_group_id).leader
+                approve_user_list = [request.user.id, leader_obj.id]
+            except Exception as e:
+                raise ParseError(self.not_group)
 
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
