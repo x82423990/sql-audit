@@ -110,12 +110,13 @@ class ActionMxins(AppellationMixins, object):
         if sqlobj.env == self.env_prd:
             user_obj = self.request.user
             if user_obj.role == 'developer_manager' and mailtype == self.action_type_check:
-                mailto = User.objects.filter(role='developer_supremo')[0].email
+                mailto_1 = User.objects.filter(role='developer_supremo')[0].email
+                mailto_2 = User.objects.filter(role='developer_supremo')[1].email
             # username = user_obj.username
             username = sqlobj.commiter
             # mailto_users = list(set(mailto_users))
             # mailto_list = [u.email for u in User.objects.filter(username__in=mailto_users)]
-            mail_list = []
-            mail_list.append(mailto)
+            mail_list = [mailto_1, mailto_2]
+            # mail_list.append(mailto)
             send_mail.delay(mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
                             sqlobj.db.name, max_rows)
