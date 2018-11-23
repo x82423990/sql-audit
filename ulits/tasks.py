@@ -8,9 +8,7 @@ mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
 mail_user = "zabbix@9ffenqigo.com"  # 用户名
 mail_pass = "bycx.40450"  # 密码
 mail_postfix = "SQL审计通知"  # 发件箱的后缀
-# mail_host = "smtp.163.com"
-# mail_user = "eatted@163.com"
-# mail_pass = "xl50140872"
+
 
 
 @shared_task
@@ -26,7 +24,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
             if s:
                 sqlhtml = sqlhtml + '<div>' + s + ';' + '</div>'
         contenthtml = "<span style='margin-right:20px'>{} {}</span> " \
-                      "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>" \
+                      "<a href='http://audit.hd1pro.boyacx.com/#/workOrders/sqlOrder/'>【查看详情】</a>" \
                       " <p>备注：{}</p> <p>目标数据库（线上环境）：{} </p><p>SQL语句影响行数：{}行" \
                       "</p><p>SQL语句： </p>" \
             .format(
@@ -35,7 +33,7 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
             sqlhtml = sqlhtml + '<div>' + '略... ...（内容比较多，可查看详情）' + '</div>'
     elif action_type == 'approve':
         subject = "工单执行提醒"
-        title = '你的工单{}已经审批通过.'.format(sqlid)
+        title = '你提交的编号为{}工单已经审批通过已经审批通过.'.format(sqlid)
         contenthtml = "<span style='margin-right:20px'>{}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
     elif action_type == 'reject':
@@ -44,12 +42,12 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
         contenthtml = "<span style='margin-right:20px'>{}</span> " \
                       "<a href='http://120.79.128.26:8888/#/workOrders/sqlOrder/'>【查看详情】</a>".format(title)
 
-    me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
+    # me = "<" + mail_user + "@" + mail_postfix + ">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     # me = "<"'hulala'+'@'+'DbApprove.com'">"  # 这里的hello可以任意设置，收到信后，将按照设置显示
     msg = MIMEText(contenthtml + sqlhtml, _subtype='html', _charset='utf-8')  # 创建一个实例，这里设置为html格式邮件
     # msg['Subject'] = '{} {} [{}]'.format(personnel, title, note)  # 设置主题
-    msg['Subject'] = '{}]'.format(subject)
-    msg['From'] = me
+    msg['Subject'] = subject
+    msg['From'] = mail_user
     msg['To'] = ";".join(to_list)
     try:
         s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
