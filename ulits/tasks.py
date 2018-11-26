@@ -4,16 +4,20 @@ import smtplib
 from email.mime.text import MIMEText
 from celery import shared_task
 
-mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
-mail_user = "zabbix@9ffenqigo.com"  # 用户名
-mail_pass = "bycx.40450"  # 密码
+# mail_host = "smtp.qiye.aliyun.com"  # 设置服务器
+# mail_user = "zabbix@9ffenqigo.com"  # 用户名
+# mail_pass = "bycx.40450"  # 密码
+# mail_postfix = "SQL审计通知"  # 发件箱的后缀
+mail_host = "smtp.163.com"  # 设置服务器
+mail_user = "eatted@163.com"  # 用户名
+mail_pass = "xl50140872"  # 密码
 mail_postfix = "SQL审计通知"  # 发件箱的后缀
-
 
 
 @shared_task
 def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
               max_rows):  # to_list：收件人；sub：主题；content：邮件内容
+    print("tolist", to_list, max_rows)
     contenthtml = ''
     sqlhtml = ''
     subject = ""
@@ -50,11 +54,12 @@ def send_mail(to_list, personnel, sqlid, note, action_type, sqlcontent, dbname,
     msg['From'] = mail_user
     msg['To'] = ";".join(to_list)
     try:
-        s = smtplib.SMTP_SSL(host=mail_host, port=465, timeout=1)
+        s = smtplib.SMTP_SSL(host=mail_host, port=996, timeout=1)
         # s.starttls()
         s.login(mail_user, mail_pass)  # 登陆服务器
         s.sendmail(mail_user, msg['To'].split(','), msg.as_string())  # 发送邮件
         s.close()
+        print("发送成功")
         return True
     except Exception as e:
         print(e)

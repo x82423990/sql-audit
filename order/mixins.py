@@ -118,6 +118,6 @@ class ActionMxins(AppellationMixins, object):
             mailto_conv = [mailto]
             mail_list = []
             mail_list.extend(mailto_conv)
-            print(mail_list)
+            print(mail_list, max_rows)
             send_mail.delay(mail_list, username, sqlobj.id, sqlobj.sql_backup, mailtype, sqlobj.sql_content,
                             sqlobj.db.name, max_rows)
