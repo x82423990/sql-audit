@@ -86,6 +86,14 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             return userlist
         return userlist
 
+    # 判断是否是ddl
+    @staticmethod
+    def is_ddl(sql_content):
+        ddl_list = ["create", "alter", "drop"]
+        for i in ddl_list:
+            if re.search(i, sql_content, re.IGNORECASE):
+                return True
+
     # 重写create 方法
     def create(self, request, *args, **kwargs):
         # 处理 数据
@@ -95,19 +103,19 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 检查数据库是否可达
         self.test_connect(db_id)
         sql_content = request_data.get('sql_content')
-        create_tag = re.search(self.ddl_tag, sql_content, re.IGNORECASE)
+        ddl_tag = self.is_ddl(sql_content)
+
         # 去获取该次提交影响的行数
-        if create_tag is None:
+        if ddl_tag is None:
             try:
                 rows = self.max_effect_rows(db_id, sql_content)
             except Exception as e:
                 raise ParseError(e, self.connect_error)
         else:
             rows = 0
-        if rows == 0 and create_tag is None:
+        if rows == 0 and ddl_tag is None:
             raise ParseError(self.row_is_non)
         if isSup:
-
             user_list = [i.id for i in User.objects.filter(role=self.super)]
             approve_user_list = user_list
             user_group_id = None
