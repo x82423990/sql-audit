@@ -26,7 +26,7 @@ class InceptionSerializer(serializers.ModelSerializer):
         super_user_list = [i.username for i in User.objects.filter(role="developer_supremo")]
         # super_user_list = [5, 6]
         commit_user = User.objects.get(username=instance.commiter)
-        step_num = 1 if commit_user.role == "developer_supremo" else 0
+        step_num = 1 if commit_user.role != "developer" else 0
         for step in steps:
             username = [step.user.username] if step_num < 1 else super_user_list
             updatetime = step.updatetime if step.status != 0 else ''

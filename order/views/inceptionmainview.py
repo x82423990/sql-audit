@@ -38,7 +38,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 return queryset.filter(commiter=commiter)
 
             if keyword == "approve":
-                return queryset.filter(~Q(commiter=commiter))
+                return queryset.filter(~Q(commiter=commiter) & ~Q(status=1))
         return queryset
 
     # def filter_approve_status(self, queryset):
