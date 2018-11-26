@@ -40,4 +40,4 @@ deploy:
     name: test
     url: http://dev.msvc.microvast.com.cn/
   tags:
-    - deploy
+    - docker
