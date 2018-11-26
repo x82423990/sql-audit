@@ -4,9 +4,7 @@ services:
   alias: docker
 stages:
   - compile
-  - build
-
-#   - deploy
+  - deploy
 
 variables:
   CI_JOB_USER: "xieyifan"
@@ -32,3 +30,14 @@ compile:
   tags:
   - docker
 
+deploy:
+  stage: deploy
+  script:
+  # 这里一定要加上namespace，因为他只有操作这个namespace的权限
+    - kubectl get pod -n ci-ns
+  # 加上环境
+  environment:
+    name: test
+    url: http://dev.msvc.microvast.com.cn/
+  tags:
+    - deploy
