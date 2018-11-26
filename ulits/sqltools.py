@@ -46,8 +46,8 @@ class Inception(object):
     def rows_effect(self, db, host, pwd, port, user, test=None):
         # try:
         password = self.decrypt_password(pwd)
+        print("password", password)
         conn = pymysql.connect(user=user, host=host, password=password, db=db, port=port, connect_timeout=5)
-
 
         # 测试连通性
         if test is not None:

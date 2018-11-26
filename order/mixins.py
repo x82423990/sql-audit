@@ -100,11 +100,12 @@ class ActionMxins(AppellationMixins, object):
         except Exception as e:
             raise ParseError(e)
         try:
-            ret = Inception().rows_effect(user=dbobj.user, pwd=dbobj.password, host=dbobj.host,
+            ret = Inception().rows_effect(user=dbobj.user, pwd=str(dbobj.password), host=dbobj.host,
                                           port=int(dbobj.port), db=dbobj.name, test=True)
+
             return ret
-        except Exception as e:
-            raise ParseError("host %s %s" % (dbobj.host, e))
+        except Exception:
+            raise ParseError("host -%s-, -%s-" % (dbobj.host, "链接错误"))
 
     def mail(self, sqlobj, mailto, mailtype, max_rows=None):
         if sqlobj.env == self.env_prd:

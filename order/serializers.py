@@ -65,6 +65,7 @@ class DbSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.get('password')
+        print("password", password)
         pc = prpcrypt()
         validated_data['password'] = pc.encrypt(password)
         return super(DbSerializer, self).create(validated_data)
@@ -136,10 +137,10 @@ class SuggestionSerializer(serializers.ModelSerializer):
         return ret
 
 
-class DbSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dbconf
-        fields = '__all__'
+# class DbSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Dbconf
+#         fields = '__all__'
 
 
 class SegmentsSerializer(serializers.ModelSerializer):
