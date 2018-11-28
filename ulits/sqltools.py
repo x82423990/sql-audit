@@ -77,9 +77,8 @@ class Inception(object):
             lines += line
         else:
             raise Exception("非InnoDB的表不适用！")
-
-    conn.close()
-    return lines
+        conn.close()
+        return lines
 
 
 def manual(self):  # 查询回滚库/表
