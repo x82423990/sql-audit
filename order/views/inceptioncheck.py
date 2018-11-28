@@ -140,9 +140,9 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
             # handle_result = None
             # request_data['type'] = self.type_select_tag
         else:
-            # inception 执行返回的结果
+            print("inception 执行返回的结果")
             handle_result = self.check_execute_sql(db_id, sql_content, self.action_type_check)[-1]
-
+            print("------", handle_result)
         # 初始化一个工单
         workorder_serializer = self.serializer_order(data={})
         workorder_serializer.is_valid()
