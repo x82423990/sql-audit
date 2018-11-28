@@ -6,7 +6,7 @@ from rest_framework.exceptions import ParseError
 from .dbcrypt import prpcrypt
 from pymysql.err import ProgrammingError
 from _mysql_exceptions import OperationalError, ProgrammingError
-
+import re
 
 class Inception(object):
 
@@ -57,45 +57,55 @@ class Inception(object):
         for i in sqls:
             cur = conn.cursor()
             try:
-                cur.execute("desc %s;" % i)
+                insert_tag = re.search('insert', i, re.IGNORECASE)
+                if insert_tag:
+                    table_name = i.split(' ')[2]
+                else:
+                    cur.execute("desc %s;" % i)
+                    table_name = cur.fetchone()[2]
             except (OperationalError, ProgrammingError) as e:
                 raise ParseError(e)
             # ("cur.fetchone()", cur.fetchall())
-            table_name = cur.fetchone()[2]
-            newsql = "show table status where name='%s';" % table_name
-            cur = conn.cursor()
-            cur.execute(newsql)
-            engine = cur.fetchone()[1]
-            if engine == "InnoDB":
-                cur = conn.cursor()
-                line = cur.execute(i + ";")
-                lines += line
-            else:
-                raise Exception("非InnoDB的表不适用！")
-        conn.close()
-        return lines
 
-    def manual(self):  # 查询回滚库/表
-        conn = pymysql.connect(host=self.inception_ipaddr, port=self.port, user=self.user, passwd=self.passwd,
-                               db=self.dbname, charset='utf8')  # 连接SQL备份服务器
-        conn.autocommit(True)
+        newsql = "show table status where name='%s';" % table_name
         cur = conn.cursor()
-        cur.execute(self.sql)
-        return cur.fetchall()
+        cur.execute(newsql)
+        engine = cur.fetchone()[1]
+        if engine == "InnoDB":
+            cur = conn.cursor()
+            line = cur.execute(i + ";")
+            lines += line
+        else:
+            raise Exception("非InnoDB的表不适用！")
 
-    def get_back_table(self):
-        return self.manual()[0][0]
+    conn.close()
+    return lines
 
-    def get_back_sql(self):
-        per_rollback = self.manual()
-        back_sql = ''  # 回滚语句
-        for i in per_rollback:  # 累加
-            back_sql += i[0]
-        return back_sql
 
-    def get_index_list(self):
-        res = self.manual()[3:]
-        return [index_info[0] for index_info in res]
+def manual(self):  # 查询回滚库/表
+    conn = pymysql.connect(host=self.inception_ipaddr, port=self.port, user=self.user, passwd=self.passwd,
+                           db=self.dbname, charset='utf8')  # 连接SQL备份服务器
+    conn.autocommit(True)
+    cur = conn.cursor()
+    cur.execute(self.sql)
+    return cur.fetchall()
+
+
+def get_back_table(self):
+    return self.manual()[0][0]
+
+
+def get_back_sql(self):
+    per_rollback = self.manual()
+    back_sql = ''  # 回滚语句
+    for i in per_rollback:  # 累加
+        back_sql += i[0]
+    return back_sql
+
+
+def get_index_list(self):
+    res = self.manual()[3:]
+    return [index_info[0] for index_info in res]
 
 
 class SqlQuery(object):
