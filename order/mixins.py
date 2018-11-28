@@ -86,7 +86,7 @@ class ActionMxins(AppellationMixins, object):
                 success_sqls.append(sql_result)
             else:
                 exception_sqls.append(error_message)
-        if exception_sqls and self.action_type == '--enable-check':
+        if exception_sqls and action_type == '--enable-check':
             raise ParseError({self.exception_sqls: exception_sqls})
         return success_sqls, exception_sqls, json.dumps(result)
 
