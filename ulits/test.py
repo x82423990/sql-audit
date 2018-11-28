@@ -1,7 +1,7 @@
 import MySQLdb
 import subprocess
 import pymysql
-
+import re
 
 # sql = '/*--user=applist;--password=Fs9006;--host=172.16.130.202;--port=3306;--enable-check;*/\
 # inception_magic_start;\
@@ -40,25 +40,26 @@ inception_magic_commit;'
 
 # DESC  UPDATE test SET count=100 WHERE name='moca'
 def affect(sql):
-    db = 'test'
-    conn = MySQLdb.connect(user='root', host='172.17.69.231', passwd='Fs9006', db=db, )
-    # table_name = sql.split(" ")[1]
-    # # 判断数据库执行引擎
-    # engine = "show table status where name='%s';" % table_name
-    # (newsql)
+    conn = MySQLdb.connect(user='root', host='172.17.69.231', passwd='Fs9006', db='test', )
     cur = conn.cursor()
-    cur.execute("desc %s" % sql)
-    table_name = cur.fetchone()[2]
+    db = 'test'
+    insert_tag = re.search('insert', sql, re.IGNORECASE)
+    if insert_tag:
+        table_name = sql.split(' ')[2]
+    else:
+        cur.execute("desc %s" % sql)
+        table_name = cur.fetchone()[2]
+    print('table_name', table_name)
     engine_sql = "show table status where name='%s';" % table_name
     cur.execute(engine_sql)
     engine = cur.fetchone()[1]
-    (engine)
+    print('engine', engine)
     if engine == "InnoDB":
         line = cur.execute(sql)
     else:
         raise Exception("非InnoDB的表不适用！")
     conn.close()
-    (line)
+    print('line', line)
 
 
 # class SqlQuery(object):
@@ -113,9 +114,12 @@ sql = '/* --user=root; --password=Fs9006; --host=120.79.128.26; --port=3306; --e
      `realName` varchar(50) NOT NULL Default "" comment "aaa",\
      `age` int(11) NOT NULL Default 0 comment "aaa",\
      PRIMARY KEY (`ID`); inception_magic_commit;'
-#
-conn(sql)
 
+sql2 ='INSERT INto info (username,sex,money)VALUES("wangang",1,506); '
+sql3 = 'UPDATE info SET money=536 WHERE username="zhang";'
+#
+# conn(sql)
+affect(sql2)
 # sqll = '/*--user=root;--password=Fs9006;--host=172.17.69.231;--port=3306;--enable-execute;*/\
 # inception_magic_start;\
 # use test;\
