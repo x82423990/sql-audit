@@ -26,7 +26,7 @@ compile:
   - docker push  ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:5}
   - echo "suceess"
   only:
-  - test
+  - master
   tags:
   - docker
 
