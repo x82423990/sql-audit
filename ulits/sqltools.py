@@ -59,8 +59,10 @@ class Inception(object):
             cur = conn.cursor()
             try:
                 insert_tag = re.search('insert', i, re.IGNORECASE)
+                print("insert....................")
                 if insert_tag:
-                    table_name = i.split(' ')[2]
+                    table_name = i.split(' ')[2].replace("`", "")
+                    print('table_name', table_name)
                 else:
                     cur.execute("desc %s;" % i)
                     table_name = cur.fetchone()[2]

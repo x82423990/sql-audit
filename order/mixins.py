@@ -68,10 +68,7 @@ class ActionMxins(AppellationMixins, object):
         dbobj = Dbconf.objects.get(id=db_id)
         db_addr = self.get_db_addr(dbobj.user, dbobj.password, dbobj.host, dbobj.port, action_type)
         # try:
-        print("开始进入")
-        print("db_addr", db_addr)
         sql_review = Inception(sql_content, dbobj.name).inception_handle(db_addr)
-        print("执行成功")
 
         # except Exception as e:
         #     raise ParseError(e)

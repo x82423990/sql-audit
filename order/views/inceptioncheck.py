@@ -108,6 +108,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
         # 去获取该次提交影响的行数
         if ddl_tag is None:
             try:
+                print("去获取影响行数")
                 rows = self.max_effect_rows(db_id, sql_content)
             except Exception as e:
                 raise ParseError(e, self.connect_error)

@@ -168,6 +168,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
             success_sqls, exception_sqls, handle_result = self.check_execute_sql(instance.db.id,
                                                                                  instance.sql_content,
                                                                                  self.action_type_execute)
+            print(success_sqls, exception_sqls, handle_result)
             for success_sql in success_sqls:
                 instance.rollback_db = success_sql[8]
                 affected_rows += success_sql[6]
@@ -179,6 +180,7 @@ class InceptionMainView(PromptMxins, ActionMxins, BaseView):
                 instance.status = 2
                 instance.execute_errors = exception_sqls
                 self.ret['status'] = -1
+                raise ParseError(exception_sqls)
             instance.rollback_opid = opids
             instance.handle_result = handle_result
             self.ret['msg'] = exception_sqls
