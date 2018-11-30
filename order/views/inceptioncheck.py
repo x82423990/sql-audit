@@ -134,7 +134,7 @@ class InceptionCheckView(PromptMxins, ActionMxins, BaseView):
 
         # 获取提交的SQL 语句
         # 如果是select语句 返回request type,不执行check, 否则返回check 的结果，
-        select = re.search(self.type_select_tag, sql_content, re.IGNORECASE)
+        select = re.match(self.type_select_tag, sql_content, re.IGNORECASE)
         self.check_forbidden_words(sql_content)
         if bool(select):
             raise ParseError(self.forbidden_select)
