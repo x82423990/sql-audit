@@ -55,31 +55,33 @@ class Inception(object):
             return True
         sqls = self.sql.replace("\n", "").split(";")[0:-1]
         lines = 0
+        table_name_list = []
         for i in sqls:
             cur = conn.cursor()
             try:
-                insert_tag = re.search('insert', i, re.IGNORECASE)
-                print("insert....................")
+                insert_tag = re.match('insert', i, re.IGNORECASE)
                 if insert_tag:
                     table_name = i.split(' ')[2].replace("`", "")
                     print('table_name', table_name)
                 else:
                     cur.execute("desc %s;" % i)
                     table_name = cur.fetchone()[2]
+                table_name_list.append(table_name.upper())
             except (OperationalError, ProgrammingError) as e:
                 raise ParseError(e)
             # ("cur.fetchone()", cur.fetchall())
-
-        newsql = "show table status where name='%s';" % table_name
-        cur = conn.cursor()
-        cur.execute(newsql)
-        engine = cur.fetchone()[1]
-        if engine == "InnoDB":
+            if len(set(table_name_list)) != 1:
+                raise ParseError("不同的表请分别提交工单！")
+            newsql = "show table status where name='%s';" % table_name
             cur = conn.cursor()
-            line = cur.execute(i + ";")
-            lines += line
-        else:
-            raise Exception("非InnoDB的表不适用！")
+            cur.execute(newsql)
+            engine = cur.fetchone()[1]
+            if engine == "InnoDB":
+                cur = conn.cursor()
+                line = cur.execute(i + ";")
+                lines += line
+            else:
+                raise Exception("非InnoDB的表不适用！")
         conn.close()
         return lines
 
