@@ -3,7 +3,7 @@
 仓库地址:
 
 ```
-https://gitlab.boyait.9fwealth.com/devops/DevOpsPlatForm.git
+https://gitlab.***.com/devops/DevOpsPlatForm.git
 ```
 
 
