@@ -34,14 +34,16 @@ class Inception(object):
                                    charset="utf8")  # 连接inception
             cur = conn.cursor()
             try:
+                print("sql", sql)
                 cur.execute(sql)
             except pymysql.err.ProgrammingError as e:
-                raise e
+                raise ("执行失败" + e)
             result = cur.fetchall()
             conn.close()
         except pymysql.Error as e:
             status = -1
             result = "Mysql Error {}: {}".format(e.args[0], e.args[1])
+        print('result', result)
         return {'result': result, 'status': status}
 
     def rows_effect(self, db, host, pwd, port, user, test=None):
@@ -68,7 +70,7 @@ class Inception(object):
                     table_name = cur.fetchone()[2]
                 table_name_list.append(table_name.upper())
             except (OperationalError, ProgrammingError) as e:
-                raise ParseError(e)
+                raise ParseError("获取table name错误" + e)
             # ("cur.fetchone()", cur.fetchall())
             if len(set(table_name_list)) != 1:
                 raise ParseError("不同的表请分别提交工单！")
